@@ -44,6 +44,13 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
     setError('');
     setFileName(file.name);
 
+    // Validate file size (max 10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      setError('File size exceeds 10MB limit');
+      return;
+    }
+
     const validTypes = [
       'text/csv',
       'application/vnd.ms-excel',
@@ -60,13 +67,9 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
     reader.onload = (e) => {
       try {
         const data = e.target?.result;
-        let workbook: XLSX.WorkBook;
 
-        if (file.name.endsWith('.csv')) {
-          workbook = XLSX.read(data, { type: 'binary' });
-        } else {
-          workbook = XLSX.read(data, { type: 'array' });
-        }
+        // Use 'array' type for all files
+        const workbook = XLSX.read(data, { type: 'array' });
 
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
@@ -99,11 +102,8 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
       }
     };
 
-    if (file.name.endsWith('.csv')) {
-      reader.readAsBinaryString(file);
-    } else {
-      reader.readAsArrayBuffer(file);
-    }
+    // Use readAsArrayBuffer for all files
+    reader.readAsArrayBuffer(file);
   };
 
   const handleButtonClick = () => {
