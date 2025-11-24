@@ -1,0 +1,25 @@
+.chart-container {
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.chart-container h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 500px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .chart-wrapper {
+    height: 400px;
+  }
+}

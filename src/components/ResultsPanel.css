@@ -1,0 +1,50 @@
+.results-panel {
+  width: 100%;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.results-panel.info {
+  border-left: 4px solid #3b82f6;
+  background-color: #eff6ff;
+}
+
+.results-panel.success {
+  border-left: 4px solid #10b981;
+  background-color: #ecfdf5;
+}
+
+.results-panel.error {
+  border-left: 4px solid #ef4444;
+  background-color: #fef2f2;
+}
+
+.results-title {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.results-content {
+  color: #555;
+}
+
+.results-text {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.results-json {
+  margin: 0;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+}
