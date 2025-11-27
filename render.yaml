@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: adaptiva-fe
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://adaptiva-be.onrender.com/api
