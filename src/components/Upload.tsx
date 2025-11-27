@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
+import { api } from '../utils/api';
 import type { UploadedData } from '../types';
 import './Upload.css';
 
@@ -40,7 +41,7 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
     }
   };
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setError('');
     setFileName(file.name);
 
@@ -60,6 +61,17 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
     if (!validTypes.includes(file.type) && !file.name.match(/\.(csv|xlsx|xls)$/i)) {
       setError('Please upload a CSV or XLSX file');
       return;
+    }
+
+    // Upload to backend first to get fileId
+    const uploadResponse = await api.uploadFile(file);
+    let fileId: string | undefined;
+    
+    if (uploadResponse.success && uploadResponse.data) {
+      fileId = uploadResponse.data.file_id;
+    } else {
+      // If backend upload fails, continue with local parsing only
+      console.warn('Backend upload failed, continuing with local parsing only:', uploadResponse.error);
     }
 
     const reader = new FileReader();
@@ -95,6 +107,7 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
         onDataLoaded({
           data: formattedData,
           headers: headers,
+          fileId: fileId,
         });
       } catch (err) {
         setError('Error parsing file. Please ensure it\'s a valid CSV or XLSX file.');

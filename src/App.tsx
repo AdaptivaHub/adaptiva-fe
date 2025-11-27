@@ -6,7 +6,7 @@ import { ChartView } from './components/ChartView';
 import { ResultsPanel } from './components/ResultsPanel';
 import { useCleanData } from './hooks/useCleanData';
 import { useInsights } from './hooks/useInsights';
-import { useChart } from './hooks/useChart';
+import { useChart, type ChartResult } from './hooks/useChart';
 import { usePredict } from './hooks/usePredict';
 import { useExport } from './hooks/useExport';
 import type { UploadedData } from './types';
@@ -15,7 +15,7 @@ import './App.css';
 function App() {
   const [uploadedData, setUploadedData] = useState<UploadedData | null>(null);
   const [instructions, setInstructions] = useState('');
-  const [chartData, setChartData] = useState<Record<string, unknown> | null>(null);
+  const [chartResult, setChartResult] = useState<ChartResult | null>(null);
   const [insights, setInsights] = useState<string | Record<string, unknown> | null>(null);
   const [predictions, setPredictions] = useState<string | Record<string, unknown> | null>(null);
 
@@ -29,7 +29,7 @@ function App() {
 
   const handleDataLoaded = (data: UploadedData) => {
     setUploadedData(data);
-    setChartData(null);
+    setChartResult(null);
     setInsights(null);
     setPredictions(null);
   };
@@ -56,11 +56,13 @@ function App() {
   };
 
   const handleGenerateChart = async () => {
-    if (!uploadedData) return;
+    if (!uploadedData || !uploadedData.fileId) {
+      return;
+    }
     
-    const result = await generateChart(uploadedData.data);
+    const result = await generateChart(uploadedData.fileId, instructions);
     if (result) {
-      setChartData(result);
+      setChartResult(result);
     }
   };
 
@@ -98,6 +100,7 @@ function App() {
               onPredict={handlePredict}
               onExport={handleExport}
               disabled={isLoading || !uploadedData}
+              chartDisabled={!uploadedData?.fileId}
               instructions={instructions}
               onInstructionsChange={setInstructions}
             />
@@ -125,7 +128,13 @@ function App() {
               <ResultsPanel title="Predictions" content={predictions} type="success" />
             )}
 
-            {chartData && <ChartView chartData={chartData} />}
+            {chartResult && (
+              <ChartView 
+                chartData={chartResult.chartJson} 
+                explanation={chartResult.explanation}
+                generatedCode={chartResult.generatedCode}
+              />
+            )}
           </>
         )}
       </main>

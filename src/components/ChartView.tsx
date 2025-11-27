@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 import './ChartView.css';
 
 interface ChartViewProps {
   chartData: Record<string, unknown>;
+  explanation?: string;
+  generatedCode?: string;
 }
 
-export const ChartView: React.FC<ChartViewProps> = ({ chartData }) => {
+export const ChartView: React.FC<ChartViewProps> = ({ chartData, explanation, generatedCode }) => {
+  const [showCode, setShowCode] = useState(false);
+
   if (!chartData) {
     return null;
   }
@@ -17,7 +21,14 @@ export const ChartView: React.FC<ChartViewProps> = ({ chartData }) => {
 
   return (
     <div className="chart-container">
-      <h3>Chart Visualization</h3>
+      <h3>AI-Generated Chart</h3>
+      
+      {explanation && (
+        <div className="chart-explanation">
+          <p>{explanation}</p>
+        </div>
+      )}
+      
       <div className="chart-wrapper">
         <Plot
           data={plotData}
@@ -35,6 +46,23 @@ export const ChartView: React.FC<ChartViewProps> = ({ chartData }) => {
           }}
         />
       </div>
+      
+      {generatedCode && (
+        <div className="chart-code-section">
+          <button 
+            className="toggle-code-btn"
+            onClick={() => setShowCode(!showCode)}
+          >
+            {showCode ? 'Hide Generated Code' : 'Show Generated Code'}
+          </button>
+          
+          {showCode && (
+            <pre className="generated-code">
+              <code>{generatedCode}</code>
+            </pre>
+          )}
+        </div>
+      )}
     </div>
   );
 };

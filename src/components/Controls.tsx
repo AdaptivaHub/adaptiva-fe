@@ -8,6 +8,7 @@ interface ControlsProps {
   onPredict: () => void;
   onExport: () => void;
   disabled: boolean;
+  chartDisabled?: boolean;
   instructions: string;
   onInstructionsChange: (instructions: string) => void;
 }
@@ -19,6 +20,7 @@ export const Controls: React.FC<ControlsProps> = ({
   onPredict,
   onExport,
   disabled,
+  chartDisabled = false,
   instructions,
   onInstructionsChange,
 }) => {
@@ -67,8 +69,8 @@ export const Controls: React.FC<ControlsProps> = ({
         <button
           className="control-button chart"
           onClick={onGenerateChart}
-          disabled={disabled}
-          title="Generate visualizations from the data"
+          disabled={disabled || chartDisabled}
+          title={chartDisabled ? "Backend connection required for AI chart generation" : "Generate AI-powered visualizations from the data"}
         >
           <svg className="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

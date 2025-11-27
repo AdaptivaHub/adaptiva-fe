@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type { ApiResponse, DataRow } from '../types';
+import type { ApiResponse, DataRow, AIChartResponse, FileUploadResponse } from '../types';
 
 // Use environment variable or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -12,6 +12,22 @@ const apiClient = axios.create({
 });
 
 export const api = {
+  uploadFile: async (file: File): Promise<ApiResponse<FileUploadResponse>> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await apiClient.post('/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<FileUploadResponse>(error);
+    }
+  },
+
   cleanData: async (data: DataRow[]): Promise<ApiResponse<DataRow[]>> => {
     try {
       const response = await apiClient.post('/clean', { data });
@@ -30,6 +46,19 @@ export const api = {
     }
   },
 
+  generateAIChart: async (fileId: string, userInstructions?: string): Promise<ApiResponse<AIChartResponse>> => {
+    try {
+      const response = await apiClient.post('/charts/ai', {
+        file_id: fileId,
+        user_instructions: userInstructions || null,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<AIChartResponse>(error);
+    }
+  },
+
+  // Keep the old method for backwards compatibility
   generateChart: async (data: DataRow[], chartType?: string): Promise<ApiResponse<Record<string, unknown>>> => {
     try {
       const response = await apiClient.post('/chart', { data, chartType });
