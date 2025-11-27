@@ -28,7 +28,7 @@ export const Controls: React.FC<ControlsProps> = ({
     <div className="controls-container">
       <div className="instructions-section">
         <label htmlFor="instructions" className="instructions-label">
-          Instructions (Optional)
+          Instructions
         </label>
         <textarea
           id="instructions"

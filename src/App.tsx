@@ -118,8 +118,6 @@ function App() {
               </div>
             )}
 
-            <Preview data={uploadedData.data} headers={uploadedData.headers} />
-
             {insights && (
               <ResultsPanel title="AI Insights" content={insights} type="info" />
             )}
@@ -135,6 +133,8 @@ function App() {
                 generatedCode={chartResult.generatedCode}
               />
             )}
+
+            <Preview data={uploadedData.data} headers={uploadedData.headers} />
           </>
         )}
       </main>
