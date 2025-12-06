@@ -78,3 +78,24 @@
   border-radius: 6px;
   border: 1px solid #fcc;
 }
+
+.upload-area.uploading {
+  pointer-events: none;
+  background-color: #f0f0ff;
+  border-color: #646cff;
+}
+
+.upload-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #646cff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
