@@ -30,6 +30,16 @@ export interface FileUploadResponse {
   message: string;
 }
 
+export interface PreviewResponse {
+  file_id: string;
+  headers: string[];
+  data: Record<string, string>[];
+  total_rows: number;
+  preview_rows: number;
+  formatted: boolean;
+  message: string;
+}
+
 export interface ApiResponse<T = Record<string, unknown>> {
   success: boolean;
   data?: T;

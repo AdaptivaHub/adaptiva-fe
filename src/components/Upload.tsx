@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import * as XLSX from 'xlsx';
 import { api } from '../utils/api';
 import type { UploadedData } from '../types';
 import './Upload.css';
@@ -68,70 +67,47 @@ export const Upload: React.FC<UploadProps> = ({ onDataLoaded }) => {
     }
 
     try {
-      // Upload to backend first to get fileId
+      // Step 1: Upload file to backend
       const uploadResponse = await api.uploadFile(file);
-      let fileId: string | undefined;
       
-      if (uploadResponse.success && uploadResponse.data) {
-        fileId = uploadResponse.data.file_id;
-      } else {
-        // If backend upload fails, continue with local parsing only
-        console.warn('Backend upload failed, continuing with local parsing only:', uploadResponse.error);
+      if (!uploadResponse.success || !uploadResponse.data) {
+        setError(uploadResponse.error || 'Failed to upload file. Please try again.');
+        setIsUploading(false);
+        return;
       }
 
-      const reader = new FileReader();
+      const fileId = uploadResponse.data.file_id;
 
-      reader.onload = (e) => {
-        try {
-          const data = e.target?.result;
-
-          // Use 'array' type for all files
-          const workbook = XLSX.read(data, { type: 'array' });
-
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-          const jsonData: unknown[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-          if (jsonData.length === 0) {
-            setError('The file appears to be empty');
-            setIsUploading(false);
-            return;
-          }
-
-          const headers = jsonData[0] as string[];
-          const rows = jsonData.slice(1);
-
-          const formattedData = rows.map((row: unknown[]) => {
-            const rowData: Record<string, string | number | null> = {};
-            headers.forEach((header, index) => {
-              const value = row[index];
-              rowData[header] = value === undefined ? null : (value as string | number);
-            });
-            return rowData;
-          });
-
-          onDataLoaded({
-            data: formattedData,
-            headers: headers,
-            fileId: fileId,
-          });
-          setIsUploading(false);
-        } catch (err) {
-          setError('Error parsing file. Please ensure it\'s a valid CSV or XLSX file.');
-          console.error('File parsing error:', err);
-          setIsUploading(false);
-        }
-      };
-
-      reader.onerror = () => {
-        setError('Error reading file');
+      // Step 2: Get formatted preview from backend
+      const previewResponse = await api.getFormattedPreview(fileId, 1000);
+      
+      if (!previewResponse.success || !previewResponse.data) {
+        setError(previewResponse.error || 'Failed to process file. Please try again.');
         setIsUploading(false);
-      };
+        return;
+      }
 
-      // Use readAsArrayBuffer for all files
-      reader.readAsArrayBuffer(file);
+      const { headers, data } = previewResponse.data;
+      
+      // Convert string values to DataRow format
+      const formattedData = data.map(row => {
+        const rowData: Record<string, string | number | null> = {};
+        headers.forEach(header => {
+          rowData[header] = row[header] ?? null;
+        });
+        return rowData;
+      });
+
+      onDataLoaded({
+        data: formattedData,
+        headers: headers,
+        fileId: fileId,
+      });
+      
+      setIsUploading(false);
     } catch (err) {
-      setError('Error uploading file. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(`Error uploading file: ${errorMessage}`);
       console.error('Upload error:', err);
       setIsUploading(false);
     }

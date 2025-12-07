@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type { ApiResponse, DataRow, AIChartResponse, FileUploadResponse } from '../types';
+import type { ApiResponse, DataRow, AIChartResponse, FileUploadResponse, PreviewResponse } from '../types';
 
 // Use environment variable or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -58,16 +58,6 @@ export const api = {
     }
   },
 
-  // Keep the old method for backwards compatibility
-  generateChart: async (data: DataRow[], chartType?: string): Promise<ApiResponse<Record<string, unknown>>> => {
-    try {
-      const response = await apiClient.post('/chart', { data, chartType });
-      return response.data;
-    } catch (error) {
-      return handleApiError<Record<string, unknown>>(error);
-    }
-  },
-
   predict: async (data: DataRow[], instructions?: string): Promise<ApiResponse<string | Record<string, unknown>>> => {
     try {
       const response = await apiClient.post('/predict', { data, instructions });
@@ -76,7 +66,6 @@ export const api = {
       return handleApiError<string | Record<string, unknown>>(error);
     }
   },
-
   exportData: async (data: DataRow[], format: string = 'csv'): Promise<ApiResponse<Blob>> => {
     try {
       const response = await apiClient.post('/export', { data, format }, {
@@ -85,6 +74,18 @@ export const api = {
       return { success: true, data: response.data };
     } catch (error) {
       return handleApiError<Blob>(error);
+    }
+  },
+
+  getFormattedPreview: async (fileId: string, maxRows: number = 100): Promise<ApiResponse<PreviewResponse>> => {
+    try {
+      const response = await apiClient.post('/preview', {
+        file_id: fileId,
+        max_rows: maxRows,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<PreviewResponse>(error);
     }
   },
 };
