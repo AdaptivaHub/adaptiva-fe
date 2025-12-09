@@ -76,12 +76,16 @@ export const api = {
       return handleApiError<Blob>(error);
     }
   },
-
-  getFormattedPreview: async (fileId: string, maxRows: number = 100): Promise<ApiResponse<PreviewResponse>> => {
+  getFormattedPreview: async (
+    fileId: string, 
+    maxRows: number = 100, 
+    sheetName?: string
+  ): Promise<ApiResponse<PreviewResponse>> => {
     try {
       const response = await apiClient.post('/preview', {
         file_id: fileId,
         max_rows: maxRows,
+        sheet_name: sheetName ?? null,
       });
       return { success: true, data: response.data };
     } catch (error) {

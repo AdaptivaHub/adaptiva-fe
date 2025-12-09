@@ -6,6 +6,8 @@ export interface UploadedData {
   data: DataRow[];
   headers: string[];
   fileId?: string; // Backend file ID for API calls
+  sheets?: string[]; // Available sheets (Excel only)
+  activeSheet?: string; // Currently active sheet (Excel only)
 }
 
 export interface ChartData {
@@ -28,6 +30,8 @@ export interface FileUploadResponse {
   columns: number;
   column_names: string[];
   message: string;
+  sheets: string[] | null; // Available sheets (Excel only)
+  active_sheet: string | null; // Sheet used for initial metadata (Excel only)
 }
 
 export interface PreviewResponse {
@@ -38,6 +42,8 @@ export interface PreviewResponse {
   preview_rows: number;
   formatted: boolean;
   message: string;
+  sheet_name: string | null; // Current sheet being previewed (Excel only)
+  available_sheets: string[] | null; // All available sheets (Excel only)
 }
 
 export interface ApiResponse<T = Record<string, unknown>> {
