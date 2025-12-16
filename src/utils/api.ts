@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type { ApiResponse, DataRow, AIChartResponse, FileUploadResponse, PreviewResponse } from '../types';
+import type { ApiResponse, DataRow, AIChartResponse, FileUploadResponse, PreviewResponse, ForecastableColumnsResponse, ForecastResponse, MarketingStrategyResponse, ContentGenerationResponse, AgentPipelineResponse, UsageStatsResponse } from '../types';
 
 // Use environment variable or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -90,6 +90,129 @@ export const api = {
       return { success: true, data: response.data };
     } catch (error) {
       return handleApiError<PreviewResponse>(error);
+    }
+  },
+
+  // ============================================================================
+  // AGENT ENDPOINTS
+  // ============================================================================
+
+  getForecastableColumns: async (fileId: string): Promise<ApiResponse<ForecastableColumnsResponse>> => {
+    try {
+      const response = await apiClient.get(`/agents/forecast/columns/${fileId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<ForecastableColumnsResponse>(error);
+    }
+  },
+
+  generateForecast: async (
+    fileId: string,
+    dateColumn?: string,
+    targetColumn?: string,
+    periods: number = 30
+  ): Promise<ApiResponse<ForecastResponse>> => {
+    try {
+      const response = await apiClient.post('/agents/forecast', {
+        file_id: fileId,
+        date_column: dateColumn ?? null,
+        target_column: targetColumn ?? null,
+        periods,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<ForecastResponse>(error);
+    }
+  },
+
+  generateMarketingStrategy: async (
+    fileId: string,
+    options?: {
+      businessName?: string;
+      businessType?: string;
+      targetAudience?: string;
+      forecastTrend?: string;
+      additionalContext?: string;
+    }
+  ): Promise<ApiResponse<MarketingStrategyResponse>> => {
+    try {
+      const response = await apiClient.post('/agents/marketing/strategy', {
+        file_id: fileId,
+        business_name: options?.businessName ?? null,
+        business_type: options?.businessType ?? null,
+        target_audience: options?.targetAudience ?? null,
+        forecast_trend: options?.forecastTrend ?? null,
+        additional_context: options?.additionalContext ?? null,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<MarketingStrategyResponse>(error);
+    }
+  },
+
+  generateAdContent: async (
+    campaignName: string,
+    campaignTheme: string,
+    targetAudience: string,
+    tactics: string[],
+    options?: {
+      platform?: string;
+      tone?: string;
+      includeImage?: boolean;
+    }
+  ): Promise<ApiResponse<ContentGenerationResponse>> => {
+    try {
+      const response = await apiClient.post('/agents/content/generate', {
+        campaign_name: campaignName,
+        campaign_theme: campaignTheme,
+        target_audience: targetAudience,
+        tactics,
+        platform: options?.platform ?? 'social_media',
+        tone: options?.tone ?? 'professional',
+        include_image: options?.includeImage ?? true,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<ContentGenerationResponse>(error);
+    }
+  },
+
+  runAgentPipeline: async (
+    fileId: string,
+    options?: {
+      businessName?: string;
+      businessType?: string;
+      targetAudience?: string;
+      runForecast?: boolean;
+      runMarketing?: boolean;
+      runContent?: boolean;
+      forecastPeriods?: number;
+    }
+  ): Promise<ApiResponse<AgentPipelineResponse>> => {
+    try {
+      const response = await apiClient.post('/agents/pipeline', {
+        file_id: fileId,
+        business_name: options?.businessName ?? null,
+        business_type: options?.businessType ?? null,
+        target_audience: options?.targetAudience ?? null,
+        run_forecast: options?.runForecast ?? true,
+        run_marketing: options?.runMarketing ?? true,
+        run_content: options?.runContent ?? true,
+        forecast_periods: options?.forecastPeriods ?? 30,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<AgentPipelineResponse>(error);
+    }
+  },
+
+  // Usage statistics
+  getUsageStats: async (): Promise<ApiResponse<UsageStatsResponse>> => {
+    try {
+      const response = await apiClient.get('/agents/usage');
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<UsageStatsResponse>(error);
     }
   },
 };

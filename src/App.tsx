@@ -4,6 +4,7 @@ import { Preview } from './components/Preview';
 import { Controls } from './components/Controls';
 import { ChartView } from './components/ChartView';
 import { ResultsPanel } from './components/ResultsPanel';
+import { AgentPanel } from './components/AgentPanel';
 import { useCleanData } from './hooks/useCleanData';
 import { useInsights } from './hooks/useInsights';
 import { useChart, type ChartResult } from './hooks/useChart';
@@ -133,6 +134,8 @@ function App() {
                 generatedCode={chartResult.generatedCode}
               />
             )}
+
+            <AgentPanel fileId={uploadedData.fileId} />
 
             <Preview data={uploadedData.data} headers={uploadedData.headers} />
           </>
