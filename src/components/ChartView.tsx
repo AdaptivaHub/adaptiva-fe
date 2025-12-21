@@ -1,16 +1,40 @@
 import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
+import { ChartEditor } from './ChartEditor';
+import type { ChartSettings } from '../types';
 import './ChartView.css';
 
 interface ChartViewProps {
   chartData: Record<string, unknown>;
   explanation?: string;
   generatedCode?: string;
+  chartSettings?: ChartSettings | null;
+  columns: string[];
+  onUpdateChart: (settings: ChartSettings) => void;
+  isUpdating?: boolean;
 }
 
-export const ChartView: React.FC<ChartViewProps> = ({ chartData, explanation, generatedCode }) => {
+export const ChartView: React.FC<ChartViewProps> = ({ 
+  chartData, 
+  explanation, 
+  generatedCode,
+  chartSettings,
+  columns,
+  onUpdateChart,
+  isUpdating = false,
+}) => {
   const [showCode, setShowCode] = useState(false);
+  const [localSettings, setLocalSettings] = useState<ChartSettings>(
+    chartSettings || {}
+  );
+
+  // Update local settings when chartSettings prop changes
+  React.useEffect(() => {
+    if (chartSettings) {
+      setLocalSettings(chartSettings);
+    }
+  }, [chartSettings]);
 
   if (!chartData) {
     return null;
@@ -18,6 +42,10 @@ export const ChartView: React.FC<ChartViewProps> = ({ chartData, explanation, ge
 
   const plotData = (chartData.data || []) as Data[];
   const plotLayout = (chartData.layout || {}) as Partial<Layout>;
+
+  const handleUpdateChart = () => {
+    onUpdateChart(localSettings);
+  };
 
   return (
     <div className="chart-container">
@@ -28,6 +56,14 @@ export const ChartView: React.FC<ChartViewProps> = ({ chartData, explanation, ge
           <p>{explanation}</p>
         </div>
       )}
+
+      <ChartEditor
+        settings={localSettings}
+        columns={columns}
+        onSettingsChange={setLocalSettings}
+        onUpdateChart={handleUpdateChart}
+        disabled={isUpdating}
+      />
       
       <div className="chart-wrapper">
         <Plot

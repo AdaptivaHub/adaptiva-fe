@@ -16,11 +16,22 @@ export interface ChartData {
   layout?: Record<string, unknown>;
 }
 
+export interface ChartSettings {
+  chart_type?: string | null;
+  x_column?: string | null;
+  y_column?: string | null;
+  color_column?: string | null;
+  group_by?: string | null;
+  title?: string | null;
+  aggregation?: string | null;
+}
+
 export interface AIChartResponse {
   chart_json: Record<string, unknown>;
   generated_code: string;
   explanation: string;
   message: string;
+  chart_settings?: ChartSettings | null;
 }
 
 export interface FileUploadResponse {

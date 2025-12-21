@@ -6,7 +6,8 @@ import type {
   FileUploadResponse, 
   PreviewResponse,
   DataCleaningRequest,
-  DataCleaningResponse
+  DataCleaningResponse,
+  ChartSettings
 } from '../types';
 
 // Use environment variable or default to localhost
@@ -52,8 +53,7 @@ export const api = {
     } catch (error) {
       return handleApiError<string | Record<string, unknown>>(error);
     }
-  },
-  generateAIChart: async (fileId: string, userInstructions?: string, sheetName?: string): Promise<ApiResponse<AIChartResponse>> => {
+  },  generateAIChart: async (fileId: string, userInstructions?: string, sheetName?: string): Promise<ApiResponse<AIChartResponse>> => {
     try {
       const response = await apiClient.post('/charts/ai', {
         file_id: fileId,
@@ -63,6 +63,27 @@ export const api = {
       return { success: true, data: response.data };
     } catch (error) {
       return handleApiError<AIChartResponse>(error);
+    }
+  },
+
+  generateManualChart: async (
+    fileId: string, 
+    settings: ChartSettings, 
+    sheetName?: string
+  ): Promise<ApiResponse<{ chart_json: Record<string, unknown>; message: string }>> => {
+    try {
+      const response = await apiClient.post('/charts/', {
+        file_id: fileId,
+        sheet_name: sheetName ?? null,
+        chart_type: settings.chart_type || 'bar',
+        x_column: settings.x_column,
+        y_column: settings.y_column,
+        title: settings.title || 'Chart',
+        color_column: settings.color_column,
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<{ chart_json: Record<string, unknown>; message: string }>(error);
     }
   },
 

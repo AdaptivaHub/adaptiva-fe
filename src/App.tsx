@@ -10,7 +10,7 @@ import { useChart, type ChartResult } from './hooks/useChart';
 import { usePredict } from './hooks/usePredict';
 import { useExport } from './hooks/useExport';
 import { api } from './utils/api';
-import type { UploadedData } from './types';
+import type { UploadedData, ChartSettings } from './types';
 import './App.css';
 
 function App() {
@@ -19,10 +19,9 @@ function App() {
   const [chartResult, setChartResult] = useState<ChartResult | null>(null);
   const [insights, setInsights] = useState<string | Record<string, unknown> | null>(null);
   const [predictions, setPredictions] = useState<string | Record<string, unknown> | null>(null);
-
   const { cleanData, loading: cleanLoading, error: cleanError, result: cleaningResult } = useCleanData();
   const { getInsights, loading: insightsLoading, error: insightsError } = useInsights();
-  const { generateChart, loading: chartLoading, error: chartError } = useChart();
+  const { generateChart, generateManualChart, loading: chartLoading, error: chartError } = useChart();
   const { predict, loading: predictLoading, error: predictError } = usePredict();
   const { exportData, loading: exportLoading, error: exportError } = useExport();
 
@@ -127,11 +126,24 @@ function App() {
       setPredictions(result);
     }
   };
-
   const handleExport = async () => {
     if (!uploadedData) return;
     
     await exportData(uploadedData.data, 'csv');
+  };
+
+  const handleUpdateChartSettings = async (settings: ChartSettings) => {
+    if (!uploadedData?.fileId) return;
+    
+    const result = await generateManualChart(
+      uploadedData.fileId,
+      settings,
+      uploadedData.activeSheet
+    );
+    
+    if (result) {
+      setChartResult(result);
+    }
   };
 
   return (
@@ -201,13 +213,15 @@ function App() {
 
             {predictions && (
               <ResultsPanel title="Predictions" content={predictions} type="success" />
-            )}
-
-            {chartResult && (
+            )}            {chartResult && (
               <ChartView 
                 chartData={chartResult.chartJson} 
                 explanation={chartResult.explanation}
                 generatedCode={chartResult.generatedCode}
+                chartSettings={chartResult.chartSettings}
+                columns={uploadedData?.headers || []}
+                onUpdateChart={handleUpdateChartSettings}
+                isUpdating={chartLoading}
               />
             )}
           </>
