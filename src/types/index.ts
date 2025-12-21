@@ -64,7 +64,13 @@ export interface MissingValuesSummary {
   after: Record<string, number>;
 }
 
-export interface EnhancedCleaningRequest {
+/**
+ * Unified Data Cleaning Request
+ * 
+ * Supports all cleaning operations including Excel Copilot-like features.
+ * Uses composite key (file_id:sheet_name) for Excel files.
+ */
+export interface DataCleaningRequest {
   file_id: string;
   sheet_name?: string; // Sheet name for Excel files (uses composite key)
   normalize_columns?: boolean;
@@ -78,7 +84,12 @@ export interface EnhancedCleaningRequest {
   columns_to_drop?: string[];
 }
 
-export interface EnhancedCleaningResponse {
+/**
+ * Unified Data Cleaning Response
+ * 
+ * Returns comprehensive information about all cleaning operations performed.
+ */
+export interface DataCleaningResponse {
   file_id: string;
   sheet_name?: string; // Sheet name that was cleaned
   rows_before: number;
@@ -88,25 +99,6 @@ export interface EnhancedCleaningResponse {
   operations_log: CleaningOperation[];
   column_changes: ColumnChanges;
   missing_values_summary: MissingValuesSummary;
-  message: string;
-}
-
-export interface BasicCleaningRequest {
-  file_id: string;
-  sheet_name?: string; // Sheet name for Excel files (uses composite key)
-  drop_duplicates?: boolean;
-  drop_na?: boolean;
-  fill_na?: Record<string, unknown>;
-  columns_to_drop?: string[];
-}
-
-export interface BasicCleaningResponse {
-  file_id: string;
-  sheet_name?: string; // Sheet name that was cleaned
-  rows_before: number;
-  rows_after: number;
-  columns_before: number;
-  columns_after: number;
   message: string;
 }
 

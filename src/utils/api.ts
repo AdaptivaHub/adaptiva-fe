@@ -5,10 +5,8 @@ import type {
   AIChartResponse, 
   FileUploadResponse, 
   PreviewResponse,
-  EnhancedCleaningRequest,
-  EnhancedCleaningResponse,
-  BasicCleaningRequest,
-  BasicCleaningResponse
+  DataCleaningRequest,
+  DataCleaningResponse
 } from '../types';
 
 // Use environment variable or default to localhost
@@ -37,24 +35,13 @@ export const api = {
       return handleApiError<FileUploadResponse>(error);
     }
   },
-
-  // Basic cleaning - uses file_id based cleaning
-  basicClean: async (request: BasicCleaningRequest): Promise<ApiResponse<BasicCleaningResponse>> => {
+  // Unified data cleaning - supports all cleaning operations
+  cleanData: async (request: DataCleaningRequest): Promise<ApiResponse<DataCleaningResponse>> => {
     try {
       const response = await apiClient.post('/cleaning', request);
       return { success: true, data: response.data };
     } catch (error) {
-      return handleApiError<BasicCleaningResponse>(error);
-    }
-  },
-
-  // Enhanced cleaning - Excel Copilot-like features
-  enhancedClean: async (request: EnhancedCleaningRequest): Promise<ApiResponse<EnhancedCleaningResponse>> => {
-    try {
-      const response = await apiClient.post('/cleaning/enhanced', request);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return handleApiError<EnhancedCleaningResponse>(error);
+      return handleApiError<DataCleaningResponse>(error);
     }
   },
 

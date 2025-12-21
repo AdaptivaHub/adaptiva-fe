@@ -152,6 +152,26 @@ function App() {
               onSheetChange={handleSheetChange}
             />
 
+            {cleaningResult && (
+              <ResultsPanel 
+                title="Data Cleaning Results" 
+                content={{
+                  message: cleaningResult.message,
+                  summary: `${cleaningResult.rows_before} → ${cleaningResult.rows_after} rows, ${cleaningResult.columns_before} → ${cleaningResult.columns_after} columns`,
+                  operations: cleaningResult.operations_log.map(op => 
+                    `${op.operation}: ${op.details} (${op.affected_count} affected)`
+                  ).join('\n'),
+                  columnChanges: cleaningResult.column_changes.renamed && Object.keys(cleaningResult.column_changes.renamed).length > 0
+                    ? `Renamed: ${Object.entries(cleaningResult.column_changes.renamed).map(([old, newName]) => `"${old}" → "${newName}"`).join(', ')}`
+                    : undefined,
+                  droppedColumns: cleaningResult.column_changes.dropped.length > 0
+                    ? `Dropped: ${cleaningResult.column_changes.dropped.join(', ')}`
+                    : undefined,
+                }}
+                type="success" 
+              />
+            )}
+
             <Controls
               onCleanData={handleCleanData}
               onGetInsights={handleGetInsights}
@@ -173,26 +193,6 @@ function App() {
               <div className="error-message">
                 {cleanError || insightsError || chartError || predictError || exportError}
               </div>
-            )}
-
-            {cleaningResult && (
-              <ResultsPanel 
-                title="Data Cleaning Results" 
-                content={{
-                  message: cleaningResult.message,
-                  summary: `${cleaningResult.rows_before} → ${cleaningResult.rows_after} rows, ${cleaningResult.columns_before} → ${cleaningResult.columns_after} columns`,
-                  operations: cleaningResult.operations_log.map(op => 
-                    `${op.operation}: ${op.details} (${op.affected_count} affected)`
-                  ).join('\n'),
-                  columnChanges: cleaningResult.column_changes.renamed && Object.keys(cleaningResult.column_changes.renamed).length > 0
-                    ? `Renamed: ${Object.entries(cleaningResult.column_changes.renamed).map(([old, newName]) => `"${old}" → "${newName}"`).join(', ')}`
-                    : undefined,
-                  droppedColumns: cleaningResult.column_changes.dropped.length > 0
-                    ? `Dropped: ${cleaningResult.column_changes.dropped.join(', ')}`
-                    : undefined,
-                }}
-                type="success" 
-              />
             )}
 
             {insights && (

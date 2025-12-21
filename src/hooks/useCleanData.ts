@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { api } from '../utils/api';
-import type { EnhancedCleaningRequest, EnhancedCleaningResponse } from '../types';
+import type { DataCleaningRequest, DataCleaningResponse } from '../types';
 
 export interface CleaningOptions {
   sheetName?: string;
@@ -18,19 +18,19 @@ export interface CleaningOptions {
 export const useCleanData = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<EnhancedCleaningResponse | null>(null);
+  const [result, setResult] = useState<DataCleaningResponse | null>(null);
 
-  // Enhanced cleaning using file_id and sheet_name - this is the main method
+  // Unified cleaning using file_id and sheet_name - this is the main method
   const cleanData = useCallback(async (
     fileId: string,
     options: CleaningOptions = {}
-  ): Promise<EnhancedCleaningResponse | null> => {
+  ): Promise<DataCleaningResponse | null> => {
     setLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      const request: EnhancedCleaningRequest = {
+      const request: DataCleaningRequest = {
         file_id: fileId,
         sheet_name: options.sheetName,
         normalize_columns: options.normalizeColumns ?? true,
@@ -44,7 +44,7 @@ export const useCleanData = () => {
         columns_to_drop: options.columnsToDrop,
       };
 
-      const response = await api.enhancedClean(request);
+      const response = await api.cleanData(request);
 
       if (!response.success || !response.data) {
         setError(response.error || 'Failed to clean data');
@@ -61,9 +61,8 @@ export const useCleanData = () => {
       setLoading(false);
     }
   }, []);
-
   // Quick clean with sensible defaults
-  const quickClean = useCallback(async (fileId: string): Promise<EnhancedCleaningResponse | null> => {
+  const quickClean = useCallback(async (fileId: string): Promise<DataCleaningResponse | null> => {
     return cleanData(fileId, {
       normalizeColumns: true,
       removeEmptyRows: true,
@@ -74,7 +73,7 @@ export const useCleanData = () => {
   }, [cleanData]);
 
   // Deep clean with all options enabled
-  const deepClean = useCallback(async (fileId: string): Promise<EnhancedCleaningResponse | null> => {
+  const deepClean = useCallback(async (fileId: string): Promise<DataCleaningResponse | null> => {
     return cleanData(fileId, {
       normalizeColumns: true,
       removeEmptyRows: true,
