@@ -46,6 +46,66 @@ export interface PreviewResponse {
   available_sheets: string[] | null; // All available sheets (Excel only)
 }
 
+// Enhanced Data Cleaning Types
+export interface CleaningOperation {
+  operation: string;
+  details: string;
+  affected_count: number;
+}
+
+export interface ColumnChanges {
+  renamed: Record<string, string>;
+  dropped: string[];
+  type_converted: Record<string, string>;
+}
+
+export interface MissingValuesSummary {
+  before: Record<string, number>;
+  after: Record<string, number>;
+}
+
+export interface EnhancedCleaningRequest {
+  file_id: string;
+  normalize_columns?: boolean;
+  remove_empty_rows?: boolean;
+  remove_empty_columns?: boolean;
+  drop_duplicates?: boolean;
+  drop_na?: boolean;
+  smart_fill_missing?: boolean;
+  auto_detect_types?: boolean;
+  fill_na?: Record<string, unknown>;
+  columns_to_drop?: string[];
+}
+
+export interface EnhancedCleaningResponse {
+  file_id: string;
+  rows_before: number;
+  rows_after: number;
+  columns_before: number;
+  columns_after: number;
+  operations_log: CleaningOperation[];
+  column_changes: ColumnChanges;
+  missing_values_summary: MissingValuesSummary;
+  message: string;
+}
+
+export interface BasicCleaningRequest {
+  file_id: string;
+  drop_duplicates?: boolean;
+  drop_na?: boolean;
+  fill_na?: Record<string, unknown>;
+  columns_to_drop?: string[];
+}
+
+export interface BasicCleaningResponse {
+  file_id: string;
+  rows_before: number;
+  rows_after: number;
+  columns_before: number;
+  columns_after: number;
+  message: string;
+}
+
 export interface ApiResponse<T = Record<string, unknown>> {
   success: boolean;
   data?: T;

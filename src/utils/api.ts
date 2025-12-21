@@ -1,5 +1,15 @@
 import axios, { AxiosError } from 'axios';
-import type { ApiResponse, DataRow, AIChartResponse, FileUploadResponse, PreviewResponse } from '../types';
+import type { 
+  ApiResponse, 
+  DataRow, 
+  AIChartResponse, 
+  FileUploadResponse, 
+  PreviewResponse,
+  EnhancedCleaningRequest,
+  EnhancedCleaningResponse,
+  BasicCleaningRequest,
+  BasicCleaningResponse
+} from '../types';
 
 // Use environment variable or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -28,12 +38,23 @@ export const api = {
     }
   },
 
-  cleanData: async (data: DataRow[]): Promise<ApiResponse<DataRow[]>> => {
+  // Basic cleaning - uses file_id based cleaning
+  basicClean: async (request: BasicCleaningRequest): Promise<ApiResponse<BasicCleaningResponse>> => {
     try {
-      const response = await apiClient.post('/clean', { data });
-      return response.data;
+      const response = await apiClient.post('/cleaning', request);
+      return { success: true, data: response.data };
     } catch (error) {
-      return handleApiError<DataRow[]>(error);
+      return handleApiError<BasicCleaningResponse>(error);
+    }
+  },
+
+  // Enhanced cleaning - Excel Copilot-like features
+  enhancedClean: async (request: EnhancedCleaningRequest): Promise<ApiResponse<EnhancedCleaningResponse>> => {
+    try {
+      const response = await apiClient.post('/cleaning/enhanced', request);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<EnhancedCleaningResponse>(error);
     }
   },
 

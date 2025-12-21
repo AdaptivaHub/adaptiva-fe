@@ -35,14 +35,13 @@ function App() {
   };
 
   const handleCleanData = async () => {
-    if (!uploadedData) return;
+    if (!uploadedData?.fileId) return;
     
-    const result = await cleanData(uploadedData.data);
+    const result = await cleanData(uploadedData.fileId);
     if (result) {
-      setUploadedData({
-        data: result,
-        headers: uploadedData.headers,
-      });
+      // Data was cleaned on the server, show summary
+      console.log('Cleaning result:', result.message);
+      console.log('Operations performed:', result.operations_log);
     }
   };
 
