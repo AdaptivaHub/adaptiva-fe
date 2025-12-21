@@ -27,23 +27,57 @@ function App() {
   const { exportData, loading: exportLoading, error: exportError } = useExport();
 
   const isLoading = cleanLoading || insightsLoading || chartLoading || predictLoading || exportLoading;
-
   const handleDataLoaded = (data: UploadedData) => {
     setUploadedData(data);
     setChartResult(null);
     setInsights(null);
     setPredictions(null);
-  };  const handleCleanData = async () => {
+  };
+
+  const handleSheetChange = async (sheetName: string) => {
+    if (!uploadedData?.fileId) return;
+
+    try {
+      // Fetch preview data for the selected sheet
+      const previewResult = await api.getFormattedPreview(uploadedData.fileId, 100, sheetName);
+      
+      if (previewResult.success && previewResult.data) {
+        // Update the uploaded data with the new sheet's data
+        setUploadedData({
+          fileId: uploadedData.fileId,
+          sheets: uploadedData.sheets,
+          activeSheet: sheetName,
+          data: previewResult.data.data,
+          headers: previewResult.data.headers,
+        });
+        
+        // Clear previous analysis results when switching sheets
+        setChartResult(null);
+        setInsights(null);
+        setPredictions(null);
+      }
+    } catch (error) {
+      console.error('Error loading sheet:', error);
+    }
+  };
+  const handleCleanData = async () => {
     if (!uploadedData?.fileId) return;
     
-    const result = await cleanData(uploadedData.fileId);
+    // Pass sheet_name for Excel files to ensure correct sheet is cleaned
+    const result = await cleanData(uploadedData.fileId, { 
+      sheetName: uploadedData.activeSheet 
+    });
     if (result) {
       // Data was cleaned on the server, show summary
       console.log('Cleaning result:', result.message);
       console.log('Operations performed:', result.operations_log);
       
       // Fetch the updated preview data to reflect cleaning changes
-      const previewResult = await api.getFormattedPreview(uploadedData.fileId);
+      const previewResult = await api.getFormattedPreview(
+        uploadedData.fileId, 
+        100, 
+        uploadedData.activeSheet
+      );
       
       if (previewResult.success && previewResult.data) {
         // Update both data AND headers from the preview response
@@ -52,7 +86,7 @@ function App() {
           sheets: uploadedData.sheets,
           activeSheet: uploadedData.activeSheet,
           data: previewResult.data.data,
-          headers: previewResult.data.headers, // This should now update correctly
+          headers: previewResult.data.headers,
         });
         
         console.log('Updated headers:', previewResult.data.headers);
@@ -69,13 +103,17 @@ function App() {
       setInsights(result);
     }
   };
-
   const handleGenerateChart = async () => {
     if (!uploadedData || !uploadedData.fileId) {
       return;
     }
     
-    const result = await generateChart(uploadedData.fileId, instructions);
+    // Pass sheet_name for Excel files to ensure correct sheet is used
+    const result = await generateChart(
+      uploadedData.fileId, 
+      instructions,
+      uploadedData.activeSheet
+    );
     if (result) {
       setChartResult(result);
     }
@@ -106,7 +144,13 @@ function App() {
 
         {uploadedData && (
           <>
-            <Preview data={uploadedData.data} headers={uploadedData.headers} />
+            <Preview 
+              data={uploadedData.data} 
+              headers={uploadedData.headers}
+              sheets={uploadedData.sheets}
+              activeSheet={uploadedData.activeSheet}
+              onSheetChange={handleSheetChange}
+            />
 
             <Controls
               onCleanData={handleCleanData}

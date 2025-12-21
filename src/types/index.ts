@@ -66,6 +66,7 @@ export interface MissingValuesSummary {
 
 export interface EnhancedCleaningRequest {
   file_id: string;
+  sheet_name?: string; // Sheet name for Excel files (uses composite key)
   normalize_columns?: boolean;
   remove_empty_rows?: boolean;
   remove_empty_columns?: boolean;
@@ -79,6 +80,7 @@ export interface EnhancedCleaningRequest {
 
 export interface EnhancedCleaningResponse {
   file_id: string;
+  sheet_name?: string; // Sheet name that was cleaned
   rows_before: number;
   rows_after: number;
   columns_before: number;
@@ -91,6 +93,7 @@ export interface EnhancedCleaningResponse {
 
 export interface BasicCleaningRequest {
   file_id: string;
+  sheet_name?: string; // Sheet name for Excel files (uses composite key)
   drop_duplicates?: boolean;
   drop_na?: boolean;
   fill_na?: Record<string, unknown>;
@@ -99,6 +102,7 @@ export interface BasicCleaningRequest {
 
 export interface BasicCleaningResponse {
   file_id: string;
+  sheet_name?: string; // Sheet name that was cleaned
   rows_before: number;
   rows_after: number;
   columns_before: number;

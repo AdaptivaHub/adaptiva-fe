@@ -3,6 +3,7 @@ import { api } from '../utils/api';
 import type { EnhancedCleaningRequest, EnhancedCleaningResponse } from '../types';
 
 export interface CleaningOptions {
+  sheetName?: string;
   normalizeColumns?: boolean;
   removeEmptyRows?: boolean;
   removeEmptyColumns?: boolean;
@@ -19,7 +20,7 @@ export const useCleanData = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<EnhancedCleaningResponse | null>(null);
 
-  // Enhanced cleaning using file_id - this is the main method
+  // Enhanced cleaning using file_id and sheet_name - this is the main method
   const cleanData = useCallback(async (
     fileId: string,
     options: CleaningOptions = {}
@@ -31,6 +32,7 @@ export const useCleanData = () => {
     try {
       const request: EnhancedCleaningRequest = {
         file_id: fileId,
+        sheet_name: options.sheetName,
         normalize_columns: options.normalizeColumns ?? true,
         remove_empty_rows: options.removeEmptyRows ?? true,
         remove_empty_columns: options.removeEmptyColumns ?? true,

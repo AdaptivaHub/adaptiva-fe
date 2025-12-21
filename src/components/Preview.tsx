@@ -5,16 +5,18 @@ import './Preview.css';
 interface PreviewProps {
   data: DataRow[];
   headers: string[];
+  sheets?: string[];
+  activeSheet?: string;
+  onSheetChange?: (sheetName: string) => void;
 }
 
-export const Preview: React.FC<PreviewProps> = ({ data, headers }) => {
+export const Preview: React.FC<PreviewProps> = ({ data, headers, sheets, activeSheet, onSheetChange }) => {
   if (!data || data.length === 0) {
     return null;
   }
 
   // Show first 100 rows for performance
   const displayData = data.slice(0, 100);
-
   return (
     <div className="preview-container">
       <div className="preview-header">
@@ -43,6 +45,23 @@ export const Preview: React.FC<PreviewProps> = ({ data, headers }) => {
           </tbody>
         </table>
       </div>
+      {sheets && sheets.length > 1 && (
+        <div className="sheet-selector">
+          <span className="sheet-label">Sheets:</span>
+          <div className="sheet-buttons">
+            {sheets.map((sheet) => (
+              <button
+                key={sheet}
+                className={`sheet-button ${sheet === activeSheet ? 'active' : ''}`}
+                onClick={() => onSheetChange?.(sheet)}
+                disabled={!onSheetChange}
+              >
+                {sheet}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -12,11 +12,15 @@ export const useChart = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateChart = async (fileId: string, userInstructions?: string): Promise<ChartResult | null> => {
+  const generateChart = async (
+    fileId: string, 
+    userInstructions?: string,
+    sheetName?: string
+  ): Promise<ChartResult | null> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.generateAIChart(fileId, userInstructions);
+      const response = await api.generateAIChart(fileId, userInstructions, sheetName);
       if (!response.success || !response.data) {
         setError(response.error || 'Failed to generate chart');
         return null;

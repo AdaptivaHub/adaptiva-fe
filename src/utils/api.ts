@@ -66,11 +66,11 @@ export const api = {
       return handleApiError<string | Record<string, unknown>>(error);
     }
   },
-
-  generateAIChart: async (fileId: string, userInstructions?: string): Promise<ApiResponse<AIChartResponse>> => {
+  generateAIChart: async (fileId: string, userInstructions?: string, sheetName?: string): Promise<ApiResponse<AIChartResponse>> => {
     try {
       const response = await apiClient.post('/charts/ai', {
         file_id: fileId,
+        sheet_name: sheetName ?? null,
         user_instructions: userInstructions || null,
       });
       return { success: true, data: response.data };
