@@ -7,8 +7,10 @@ import type {
   PreviewResponse,
   DataCleaningRequest,
   DataCleaningResponse,
-  ChartSettings
+  ChartSettings,
+  RateLimitError
 } from '../types';
+import { getAccessToken, getAnonymousSession, setAnonymousSession } from '../context/AuthContext';
 
 // Use environment variable or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -18,6 +20,31 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Add auth interceptor to include JWT token in requests
+apiClient.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  // Include anonymous session for rate limiting
+  const anonSession = getAnonymousSession();
+  if (anonSession) {
+    config.headers['X-Anonymous-Session'] = anonSession;
+  }
+  
+  return config;
+});
+
+// Handle response to save anonymous session token
+apiClient.interceptors.response.use((response) => {
+  const anonSession = response.headers['x-anonymous-session'];
+  if (anonSession) {
+    setAnonymousSession(anonSession);
+  }
+  return response;
 });
 
 export const api = {
@@ -125,10 +152,36 @@ export const api = {
 
 function handleApiError<T>(error: unknown): ApiResponse<T> {
   if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
+    const axiosError = error as AxiosError<{ message?: string; error?: string; detail?: string | RateLimitError }>;
+    const responseData = axiosError.response?.data;
+    
+    // Handle rate limit errors (429)
+    if (axiosError.response?.status === 429 && responseData?.detail) {
+      const detail = responseData.detail;
+      if (typeof detail === 'object' && 'queries_used' in detail) {
+        // It's a rate limit error
+        return {
+          success: false,
+          error: detail.message || 'Rate limit exceeded',
+          data: { rateLimitError: detail } as unknown as T,
+        };
+      }
+      return {
+        success: false,
+        error: typeof detail === 'string' ? detail : 'Rate limit exceeded',
+      };
+    }
+    
+    // Handle other errors
+    const errorMessage = responseData?.error || 
+      responseData?.message || 
+      (typeof responseData?.detail === 'string' ? responseData.detail : null) ||
+      axiosError.message || 
+      'An error occurred';
+    
     return {
       success: false,
-      error: axiosError.response?.data?.error || axiosError.response?.data?.message || axiosError.message || 'An error occurred',
+      error: errorMessage,
     };
   }
   return {

@@ -1,0 +1,157 @@
+
+.rate-limit-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rate-limit-banner.exhausted {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border: 1px solid #fecaca;
+}
+
+.rate-limit-banner.warning {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1px solid #fde68a;
+}
+
+.rate-limit-banner.info {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 1px solid #bae6fd;
+}
+
+.rate-limit-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.rate-limit-icon {
+  font-size: 1.5rem;
+}
+
+.rate-limit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.rate-limit-text strong {
+  color: #1a1a2e;
+  font-size: 0.9rem;
+}
+
+.rate-limit-text p {
+  margin: 0;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.rate-limit-progress {
+  width: 100px;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rate-limit-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.rate-limit-count {
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.rate-limit-cta {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.rate-limit-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
+.rate-limit-link {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.rate-limit-link:hover {
+  text-decoration: underline;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .rate-limit-banner.exhausted {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.05));
+    border-color: rgba(220, 38, 38, 0.3);
+  }
+
+  .rate-limit-banner.warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  .rate-limit-banner.info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .rate-limit-text strong {
+    color: #f0f0f0;
+  }
+
+  .rate-limit-text p {
+    color: #aaa;
+  }
+
+  .rate-limit-count {
+    color: #aaa;
+  }
+
+  .rate-limit-progress {
+    background: #3a3a5c;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .rate-limit-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .rate-limit-content {
+    flex-direction: column;
+  }
+
+  .rate-limit-cta {
+    width: 100%;
+  }
+}

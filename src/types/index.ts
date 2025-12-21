@@ -120,3 +120,46 @@ export interface ApiResponse<T = Record<string, unknown>> {
   error?: string;
 }
 
+// =============================================================================
+// Authentication Types
+// =============================================================================
+
+export interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  full_name?: string;
+}
+
+export interface RateLimitError {
+  detail: string;
+  queries_used: number;
+  queries_limit: number;
+  reset_at: string;
+  message: string;
+}
+
