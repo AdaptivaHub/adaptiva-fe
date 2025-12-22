@@ -43,6 +43,8 @@ export interface FileUploadResponse {
   message: string;
   sheets: string[] | null; // Available sheets (Excel only)
   active_sheet: string | null; // Sheet used for initial metadata (Excel only)
+  header_row: number | null; // Detected header row index (0-based)
+  header_confidence: number | null; // Confidence score for header detection (0.0-1.0)
 }
 
 export interface PreviewResponse {
