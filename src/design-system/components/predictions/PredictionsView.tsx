@@ -1,0 +1,151 @@
+import { useState } from 'react';
+import { Brain, Plus, TrendingUp, GitBranch } from 'lucide-react';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { ModelCreator } from './ModelCreator';
+import { ModelCard } from './ModelCard';
+import { EmptyPredictionsState } from './EmptyPredictionsState';
+
+export interface TrainedModel {
+  id: string;
+  name: string;
+  type: 'linear-regression' | 'decision-tree';
+  targetVariable: string;
+  features: string[];
+  metrics: {
+    r2?: number;
+    mae?: number;
+    rmse?: number;
+    accuracy?: number;
+    crossValScores?: number[];
+  };
+  coefficients?: Record<string, number>;
+  featureImportance?: Record<string, number>;
+  confusionMatrix?: number[][];
+  trainedAt: Date;
+  dataPoints: number;
+  testSize: number;
+}
+
+interface PredictionsViewProps {
+  headers: string[];
+  data: Record<string, unknown>[];
+}
+
+export function PredictionsView({ headers, data }: PredictionsViewProps) {
+  const [models, setModels] = useState<TrainedModel[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreateModel = (model: TrainedModel) => {
+    setModels([...models, model]);
+    setIsCreating(false);
+  };
+
+  const handleDeleteModel = (modelId: string) => {
+    setModels(models.filter(m => m.id !== modelId));
+  };
+
+  const handleCancelCreate = () => {
+    setIsCreating(false);
+  };
+
+  if (models.length === 0 && !isCreating) {
+    return (
+      <div className="space-y-6">
+        <EmptyPredictionsState onCreateModel={() => setIsCreating(true)} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Predictive Models</h2>
+          <p className="text-sm text-slate-600 mt-1">
+            Train machine learning models to predict outcomes from your data
+          </p>
+        </div>
+        {!isCreating && (
+          <Button
+            onClick={() => setIsCreating(true)}
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Model
+          </Button>
+        )}
+      </div>
+
+      {/* Quick Stats */}
+      {models.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <Brain className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Total Models</p>
+                <p className="text-2xl font-bold text-slate-900">{models.length}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Linear Regression</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {models.filter(m => m.type === 'linear-regression').length}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <GitBranch className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Decision Trees</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {models.filter(m => m.type === 'decision-tree').length}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Model Creator */}
+      {isCreating && (
+        <ModelCreator
+          headers={headers}
+          data={data}
+          onModelCreated={handleCreateModel}
+          onCancel={handleCancelCreate}
+        />
+      )}
+
+      {/* Models Grid */}
+      {models.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {models.map(model => (
+            <ModelCard
+              key={model.id}
+              model={model}
+              data={data}
+              onDelete={handleDeleteModel}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
