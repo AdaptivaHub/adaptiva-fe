@@ -7,15 +7,26 @@ import { cn } from './ui/utils';
 import type { UploadedFile } from '../types';
 
 interface UploadZoneProps {
-  onFileUpload: (file: UploadedFile) => void;
+  /** Called when a file is processed (demo mode with mock data) */
+  onFileUpload?: (file: UploadedFile) => void;
+  /** Called when a raw file is selected (for custom upload handling) */
+  onFileSelect?: (file: File) => void;
+  /** External loading state */
+  isLoading?: boolean;
+  /** External drag state */
+  isDragActive?: boolean;
 }
 
-export function UploadZone({ onFileUpload }: UploadZoneProps) {
+export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoading, isDragActive: externalDragActive }: UploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  
+  // Use external states if provided
+  const isProcessing = externalLoading ?? isUploading;
+  const isDragActiveState = externalDragActive ?? isDragging;
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -30,8 +41,6 @@ export function UploadZone({ onFileUpload }: UploadZoneProps) {
   const processFile = useCallback(
     async (file: File) => {
       setError(null);
-      setIsUploading(true);
-      setUploadProgress(0);
       setUploadedFileName(file.name);
 
       // Validate file type
@@ -42,16 +51,24 @@ export function UploadZone({ onFileUpload }: UploadZoneProps) {
       ];
       if (!validTypes.includes(file.type) && !file.name.match(/\.(csv|xlsx|xls)$/i)) {
         setError('Invalid file type. Please upload a CSV or Excel file.');
-        setIsUploading(false);
         return;
       }
 
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         setError('File size exceeds 10MB limit.');
-        setIsUploading(false);
         return;
       }
+
+      // If onFileSelect is provided, use it (real upload mode)
+      if (onFileSelect) {
+        onFileSelect(file);
+        return;
+      }
+
+      // Otherwise, use demo mode with mock data
+      setIsUploading(true);
+      setUploadProgress(0);
 
       // Simulate upload progress
       const progressInterval = setInterval(() => {
@@ -95,17 +112,15 @@ export function UploadZone({ onFileUpload }: UploadZoneProps) {
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         const uploadedFile: UploadedFile = {
-          fileId: `file_${Date.now()}`,
           fileName: file.name,
-          sheets: file.name.endsWith('.xlsx') ? ['Sheet1', 'Sales Data', 'Summary'] : [],
+          sheets: file.name.endsWith('.xlsx') ? ['Sheet1', 'Sales Data', 'Summary'] : undefined,
           activeSheet: file.name.endsWith('.xlsx') ? 'Sheet1' : undefined,
           headers: mockHeaders,
           data: mockData,
           rowCount: mockData.length,
-          uploadedAt: new Date(),
         };
 
-        onFileUpload(uploadedFile);
+        onFileUpload?.(uploadedFile);
       } catch (err) {
         clearInterval(progressInterval);
         setError(err instanceof Error ? err.message : 'Failed to upload file');
@@ -151,15 +166,15 @@ export function UploadZone({ onFileUpload }: UploadZoneProps) {
       <Card
         className={cn(
           'relative overflow-hidden transition-all duration-200 upload-pulse',
-          isDragging && 'ring-2 ring-indigo-500 ring-offset-2',
-          isUploading && 'pointer-events-none'
+          isDragActiveState && 'ring-2 ring-indigo-500 ring-offset-2',
+          isProcessing && 'pointer-events-none'
         )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         <div className="p-12">
-          {!isUploading ? (
+          {!isProcessing ? (
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-4">
                 <Upload className="w-8 h-8 text-indigo-600" />
@@ -219,10 +234,8 @@ export function UploadZone({ onFileUpload }: UploadZoneProps) {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Drag overlay */}
-        {isDragging && (
+        </div>        {/* Drag overlay */}
+        {isDragActiveState && (
           <div className="absolute inset-0 bg-indigo-50/80 backdrop-blur-sm flex items-center justify-center border-2 border-dashed border-indigo-400">
             <div className="text-center">
               <Upload className="w-12 h-12 text-indigo-600 mx-auto mb-2" />

@@ -13,7 +13,9 @@ export * from './components/ui';
 export { DashboardLayout } from './components/DashboardLayout';
 export { DataPreview } from './components/DataPreview';
 export { DataQualityBanner } from './components/DataQualityBanner';
+export type { DataQualityBannerProps } from './components/DataQualityBanner';
 export { EmptyState } from './components/EmptyState';
+export type { EmptyStateProps } from './components/EmptyState';
 export { UploadZone } from './components/UploadZone';
 
 // Utils (export functions, not types again)

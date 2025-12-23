@@ -45,7 +45,12 @@ import type { UploadedFile, DataQualityReport } from '../types';
 
 interface DataPreviewProps {
   file: UploadedFile;
-  onSheetChange: (sheetName: string) => void;
+  /** Data rows - can be passed separately or included in file */
+  data?: Record<string, unknown>[];
+  /** Column headers - can be passed separately or included in file */
+  headers?: string[];
+  onSheetChange?: (sheetName: string) => void;
+  onNewUpload?: () => void;
   qualityReport?: DataQualityReport | null;
 }
 
@@ -59,7 +64,18 @@ interface ColumnStats {
   max?: number;
 }
 
-export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport }: DataPreviewProps) {
+export function DataPreview({ 
+  file, 
+  data: dataProp, 
+  headers: headersProp,
+  onSheetChange, 
+  onNewUpload,
+  qualityReport: _qualityReport 
+}: DataPreviewProps) {
+  // Use props if provided, otherwise fall back to file properties
+  const headers = headersProp ?? file.headers ?? [];
+  const data = dataProp ?? file.data ?? [];
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -70,8 +86,8 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
   const columnStats = useMemo(() => {
     const stats: Record<string, ColumnStats> = {};
 
-    file.headers.forEach((header) => {
-      const values = file.data.map((row) => row[header]);
+    headers.forEach((header) => {
+      const values = data.map((row) => row[header]);
       const nonNullValues = values.filter((v) => v != null && v !== '');
 
       // Detect column type
@@ -103,17 +119,15 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
           stat.min = Math.min(...numbers);
           stat.max = Math.max(...numbers);
         }
-      }
-
-      stats[header] = stat;
+      }      stats[header] = stat;
     });
 
     return stats;
-  }, [file.headers, file.data]);
+  }, [headers, data]);
 
   // Filter and sort data
   const processedData = useMemo(() => {
-    let filtered = file.data;
+    let filtered = data;
 
     // Apply search filter
     if (searchQuery) {
@@ -139,7 +153,7 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
     }
 
     return filtered;
-  }, [file.data, searchQuery, sortColumn, sortDirection]);
+  }, [data, searchQuery, sortColumn, sortDirection]);
 
   // Pagination
   const totalPages = Math.ceil(processedData.length / rowsPerPage);
@@ -194,19 +208,24 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{file.fileName}</h2>
                 <p className="text-sm text-slate-500">
-                  Uploaded {file.uploadedAt.toLocaleDateString()}
+                  {file.rowCount.toLocaleString()} rows × {headers.length} columns
                 </p>
               </div>
             </div>
           </div>
 
-          <Button variant="outline" className="gap-2">
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
-        </div>
-
-        {/* Stats Grid */}
+          <div className="flex gap-2">
+            {onNewUpload && (
+              <Button variant="outline" onClick={onNewUpload}>
+                New Upload
+              </Button>
+            )}
+            <Button variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              Export
+            </Button>
+          </div>
+        </div>        {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-sm text-slate-500 mb-1">Total Rows</p>
@@ -216,25 +235,25 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-sm text-slate-500 mb-1">Columns</p>
-            <p className="text-2xl font-bold text-slate-900">{file.headers.length}</p>
+            <p className="text-2xl font-bold text-slate-900">{headers.length}</p>
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-sm text-slate-500 mb-1">File Size</p>
             <p className="text-2xl font-bold text-slate-900">
-              {((file.rowCount * file.headers.length * 50) / 1024).toFixed(0)} KB
+              {((file.rowCount * headers.length * 50) / 1024).toFixed(0)} KB
             </p>
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-sm text-slate-500 mb-1">Sheets</p>
             <p className="text-2xl font-bold text-slate-900">
-              {file.sheets.length || 1}
+              {file.sheets?.length || 1}
             </p>
           </div>
         </div>
       </Card>
 
       {/* Sheet Tabs (if Excel) */}
-      {file.sheets.length > 0 && (
+      {file.sheets && file.sheets.length > 0 && onSheetChange && (
         <Card className="p-4">
           <Tabs value={file.activeSheet} onValueChange={onSheetChange}>
             <TabsList>
@@ -288,15 +307,13 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
             </Select>
           </div>
         </div>
-      </Card>
-
-      {/* Data Table */}
+      </Card>      {/* Data Table */}
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
-                {file.headers.map((header) => {
+                {headers.map((header) => {
                   const stats = columnStats[header];
                   const Icon = getColumnIcon(stats?.type);
                   return (
@@ -352,8 +369,7 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
                   );
                 })}
               </TableRow>
-            </TableHeader>
-            <TableBody>
+            </TableHeader>            <TableBody>
               {paginatedData.length > 0 ? (
                 paginatedData.map((row, rowIndex) => (
                   <TableRow
@@ -363,7 +379,7 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
                       (startIndex + rowIndex) % 2 === 0 && 'bg-slate-25'
                     )}
                   >
-                    {file.headers.map((header) => (
+                    {headers.map((header) => (
                       <TableCell key={header} className="max-w-xs truncate">
                         {formatValue(row[header])}
                       </TableCell>
@@ -373,7 +389,7 @@ export function DataPreview({ file, onSheetChange, qualityReport: _qualityReport
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={file.headers.length}
+                    colSpan={headers.length}
                     className="text-center py-12 text-slate-500"
                   >
                     No data found matching your search criteria

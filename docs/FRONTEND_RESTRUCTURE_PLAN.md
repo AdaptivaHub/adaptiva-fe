@@ -24,6 +24,17 @@ Based on the answers to open questions, here are the key decisions:
 
 ---
 
+## Implementation Decisions (Resolved During Implementation)
+
+| Question | Decision |
+|----------|----------|
+| **Token Storage** | Separate utility file (`utils/tokenStorage.ts`) - both auth store and API service import from here to avoid circular dependencies |
+| **Type Systems** | Keep design-system types (`UploadedFile`, etc.) and app types (`UploadedData`, etc.) separate with clear boundaries |
+| **DashboardLayout Navigation** | Create `MainLayout.tsx` wrapper that passes navigation callbacks to `DashboardLayout` (keeps design-system generic) |
+| **File State Persistence** | Hybrid: persist `fileId`, `sheets`, `activeSheet` to localStorage, but refetch data rows on mount |
+
+---
+
 ## Current State Analysis
 
 ### `adaptiva-design` (Design System)

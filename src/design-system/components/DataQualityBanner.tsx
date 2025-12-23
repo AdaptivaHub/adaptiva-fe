@@ -4,33 +4,47 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
+import type { DataQualityReport, DataQualityIssue } from '../utils/dataQuality';
 
-interface DataQualityIssue {
-  type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
-  count: number;
-  severity: 'high' | 'medium' | 'low';
+interface DataQualityBannerBaseProps {
+  onCleanData?: () => void;
+  onDismiss?: () => void;
+  /** Alias for onCleanData */
+  onClean?: () => void;
 }
 
-interface DataQualityBannerProps {
+interface DataQualityBannerWithReport extends DataQualityBannerBaseProps {
+  report: DataQualityReport;
+  issues?: never;
+  qualityScore?: never;
+}
+
+interface DataQualityBannerWithIssues extends DataQualityBannerBaseProps {
+  report?: never;
   issues: DataQualityIssue[];
   qualityScore: number;
-  onCleanData: () => void;
-  onDismiss: () => void;
 }
 
-export function DataQualityBanner({
-  issues,
-  qualityScore,
-  onCleanData,
-  onDismiss,
-}: DataQualityBannerProps) {
+export type DataQualityBannerProps = DataQualityBannerWithReport | DataQualityBannerWithIssues;
+
+export function DataQualityBanner(props: DataQualityBannerProps) {
+  // Extract values from either report or direct props
+  const issues = 'report' in props && props.report ? props.report.issues : props.issues!;
+  const qualityScore = 'report' in props && props.report ? props.report.qualityScore : props.qualityScore!;
+  const onCleanData = props.onCleanData ?? props.onClean;
+  const onDismiss = props.onDismiss;
+
   const [isDismissed, setIsDismissed] = useState(false);
 
   if (isDismissed) return null;
 
   const handleDismiss = () => {
     setIsDismissed(true);
-    onDismiss();
+    onDismiss?.();
+  };
+
+  const handleCleanData = () => {
+    onCleanData?.();
   };
 
   const getScoreColor = (score: number) => {
@@ -124,7 +138,7 @@ export function DataQualityBanner({
                 </p>
               </div>
               <Button
-                onClick={onCleanData}
+                onClick={handleCleanData}
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-md whitespace-nowrap"
               >
                 Clean Data Now

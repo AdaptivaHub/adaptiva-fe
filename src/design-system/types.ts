@@ -4,15 +4,18 @@
 // Re-export data quality types from the canonical source
 export type { DataQualityIssue, ColumnIssue, DataQualityReport } from './utils/dataQuality';
 
+/**
+ * File info for layout/navigation components (minimal)
+ */
 export interface UploadedFile {
-  fileId: string;
   fileName: string;
-  sheets: string[];
-  activeSheet?: string;
-  headers: string[];
-  data: Record<string, unknown>[];
   rowCount: number;
-  uploadedAt: Date;
+  columnCount?: number;
+  sheets?: string[];
+  activeSheet?: string;
+  // These are optional - components that need them will have them passed separately
+  headers?: string[];
+  data?: Record<string, unknown>[];
 }
 
 export interface ChartConfig {
