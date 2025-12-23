@@ -9,18 +9,37 @@ import { Switch } from '../ui/switch';
 import { ModelTypeSelector } from './ModelTypeSelector';
 import { FeatureSelector } from './FeatureSelector';
 import { DataValidationWarning } from './DataValidationWarning';
-import type { TrainedModel } from './PredictionsView';
+
+export type ModelType = 'linear-regression' | 'decision-tree';
+
+// Training configuration passed to the app layer
+export interface ModelTrainingRequest {
+  name: string;
+  type: ModelType;
+  targetVariable: string;
+  features: string[];
+  trainSize: number;
+  maxDepth?: number;
+  useCrossValidation: boolean;
+}
 
 interface ModelCreatorProps {
   headers: string[];
   data: Record<string, unknown>[];
-  onModelCreated: (model: TrainedModel) => void;
+  /** Called when training is requested (app layer handles API call) */
+  onTrainModel: (config: ModelTrainingRequest) => void;
+  /** External training state */
+  isTraining?: boolean;
   onCancel: () => void;
 }
 
-type ModelType = 'linear-regression' | 'decision-tree';
-
-export function ModelCreator({ headers, data, onModelCreated, onCancel }: ModelCreatorProps) {
+export function ModelCreator({ 
+  headers, 
+  data, 
+  onTrainModel, 
+  isTraining = false,
+  onCancel 
+}: ModelCreatorProps) {
   const [modelType, setModelType] = useState<ModelType>('linear-regression');
   const [modelName, setModelName] = useState('');
   const [targetVariable, setTargetVariable] = useState<string>('');
@@ -28,7 +47,6 @@ export function ModelCreator({ headers, data, onModelCreated, onCancel }: ModelC
   const [trainSize, setTrainSize] = useState(80);
   const [maxDepth, setMaxDepth] = useState(5);
   const [useCrossValidation, setUseCrossValidation] = useState(true);
-  const [isTraining, setIsTraining] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Analyze data types for each column
@@ -119,44 +137,20 @@ export function ModelCreator({ headers, data, onModelCreated, onCancel }: ModelC
   }, [targetVariable, selectedFeatures, data]);
 
   const hasErrors = validationIssues.some(issue => issue.type === 'error');
-
   const handleTrain = () => {
     if (hasErrors) return;
 
-    setIsTraining(true);
+    const config: ModelTrainingRequest = {
+      name: modelName || `${modelType === 'linear-regression' ? 'Linear Regression' : 'Decision Tree'} - ${targetVariable}`,
+      type: modelType,
+      targetVariable,
+      features: selectedFeatures,
+      trainSize,
+      maxDepth: modelType === 'decision-tree' ? maxDepth : undefined,
+      useCrossValidation,
+    };
 
-    // Simulate training delay
-    setTimeout(() => {
-      // Mock model results
-      const mockModel: TrainedModel = {
-        id: `model_${Date.now()}`,
-        name: modelName || `${modelType === 'linear-regression' ? 'Linear Regression' : 'Decision Tree'} - ${targetVariable}`,
-        type: modelType,
-        targetVariable,
-        features: selectedFeatures,
-        metrics: modelType === 'linear-regression' ? {
-          r2: 0.87,
-          mae: 1234.56,
-          rmse: 1567.89,
-          crossValScores: useCrossValidation ? [0.85, 0.88, 0.86, 0.89, 0.84] : undefined,
-        } : {
-          accuracy: 0.92,
-          crossValScores: useCrossValidation ? [0.90, 0.93, 0.91, 0.92, 0.89] : undefined,
-        },
-        coefficients: modelType === 'linear-regression' ? 
-          selectedFeatures.reduce((acc, f) => ({ ...acc, [f]: Math.random() * 100 - 50 }), {}) : undefined,
-        featureImportance: modelType === 'decision-tree' ?
-          selectedFeatures.reduce((acc, f) => ({ ...acc, [f]: Math.random() }), {}) : undefined,
-        confusionMatrix: modelType === 'decision-tree' && columnTypes[targetVariable] === 'categorical' ? 
-          [[45, 5], [3, 47]] : undefined,
-        trainedAt: new Date(),
-        dataPoints: Math.floor(data.length * 0.9),
-        testSize: 100 - trainSize,
-      };
-
-      onModelCreated(mockModel);
-      setIsTraining(false);
-    }, 2000);
+    onTrainModel(config);
   };
 
   return (

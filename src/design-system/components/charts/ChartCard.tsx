@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Edit, Trash2, Maximize2, Copy, MoreVertical, Download } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
@@ -16,28 +15,42 @@ import { format } from 'date-fns';
 interface ChartCardProps {
   chart: ChartConfig;
   onEdit: (chart: ChartConfig) => void;
+  /** Called when delete is requested - app layer handles confirmation */
   onDelete: (id: string) => void;
+  /** Called when export is requested */
+  onExport?: (chart: ChartConfig) => void;
+  /** Called when duplicate is requested */
+  onDuplicate?: (chart: ChartConfig) => void;
+  /** Called when fullscreen is requested */
+  onFullscreen?: (chart: ChartConfig) => void;
   viewMode?: 'grid' | 'list';
 }
 
-export function ChartCard({ chart, onEdit, onDelete, viewMode = 'grid' }: ChartCardProps) {
-  const [_showFullscreen, setShowFullscreen] = useState(false);
+export function ChartCard({ 
+  chart, 
+  onEdit, 
+  onDelete, 
+  onExport,
+  onDuplicate,
+  onFullscreen,
+  viewMode = 'grid' 
+}: ChartCardProps) {
 
   const handleExport = () => {
-    // TODO: Implement chart export
-    console.log('Export chart:', chart.id);
-    alert('Export as PNG/SVG functionality would be triggered here');
+    onExport?.(chart);
   };
 
   const handleDuplicate = () => {
-    // TODO: Implement duplicate
-    console.log('Duplicate chart:', chart.id);
+    onDuplicate?.(chart);
   };
 
   const handleDelete = () => {
-    if (confirm(`Delete "${chart.title}"?`)) {
-      onDelete(chart.id);
-    }
+    // App layer handles confirmation dialog
+    onDelete(chart.id);
+  };
+
+  const handleFullscreen = () => {
+    onFullscreen?.(chart);
   };
 
   const getChartTypeBadgeColor = (type: ChartConfig['type']) => {
@@ -102,8 +115,7 @@ export function ChartCard({ chart, onEdit, onDelete, viewMode = 'grid' }: ChartC
                   onClick={handleDelete}
                 >
                   <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-                <DropdownMenu>
+                </Button>                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm">
                       <MoreVertical className="w-4 h-4" />
@@ -118,7 +130,7 @@ export function ChartCard({ chart, onEdit, onDelete, viewMode = 'grid' }: ChartC
                       <Copy className="w-4 h-4 mr-2" />
                       Duplicate
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setShowFullscreen(true)}>
+                    <DropdownMenuItem onClick={handleFullscreen}>
                       <Maximize2 className="w-4 h-4 mr-2" />
                       Fullscreen
                     </DropdownMenuItem>
@@ -149,8 +161,7 @@ export function ChartCard({ chart, onEdit, onDelete, viewMode = 'grid' }: ChartC
                 </Badge>
               )}
             </div>
-          </div>
-          <DropdownMenu>
+          </div>          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
                 <MoreVertical className="w-4 h-4" />
@@ -169,7 +180,7 @@ export function ChartCard({ chart, onEdit, onDelete, viewMode = 'grid' }: ChartC
                 <Copy className="w-4 h-4 mr-2" />
                 Duplicate
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowFullscreen(true)}>
+              <DropdownMenuItem onClick={handleFullscreen}>
                 <Maximize2 className="w-4 h-4 mr-2" />
                 Fullscreen
               </DropdownMenuItem>

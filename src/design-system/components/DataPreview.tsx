@@ -70,7 +70,6 @@ export function DataPreview({
   headers: headersProp,
   onSheetChange, 
   onNewUpload,
-  qualityReport: _qualityReport 
 }: DataPreviewProps) {
   // Use props if provided, otherwise fall back to file properties
   const headers = headersProp ?? file.headers ?? [];

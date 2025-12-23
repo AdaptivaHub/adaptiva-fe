@@ -1,45 +1,66 @@
-import { useState } from 'react';
 import { Plus, Download, Grid3x3, LayoutGrid } from 'lucide-react';
 import { Button } from '../ui/button';
 import { ChartCard } from './ChartCard';
-import { ChartCreator, type ChartConfig } from './ChartCreator';
+import { ChartCreator, type ChartConfig, type ChartCreationConfig } from './ChartCreator';
 import { Card } from '../ui/card';
 
 interface ChartGalleryProps {
   headers: string[];
   data: Record<string, unknown>[];
+  /** Charts to display (controlled) */
+  charts: ChartConfig[];
+  /** Current view mode (controlled) */
+  viewMode?: 'grid' | 'list';
+  /** Whether the creator is shown (controlled) */
+  showCreator?: boolean;
+  /** Chart being edited (controlled) */
+  editingChart?: ChartConfig | null;
+  /** Whether AI generation is in progress */
+  isGenerating?: boolean;
+  /** Called when view mode changes */
+  onViewModeChange?: (mode: 'grid' | 'list') => void;
+  /** Called when "Create Chart" is clicked */
+  onCreateClick?: () => void;
+  /** Called when chart is created */
+  onChartCreated?: (config: ChartCreationConfig, data: Record<string, unknown>[]) => void;
+  /** Called when AI generation is requested */
+  onAIGenerate?: (prompt: string, config: ChartCreationConfig) => void;
+  /** Called when chart is deleted */
+  onDeleteChart?: (id: string) => void;
+  /** Called when edit is requested */
+  onEditChart?: (chart: ChartConfig) => void;
+  /** Called when export chart is requested */
+  onExportChart?: (chart: ChartConfig) => void;
+  /** Called when duplicate chart is requested */
+  onDuplicateChart?: (chart: ChartConfig) => void;
+  /** Called when fullscreen is requested */
+  onFullscreenChart?: (chart: ChartConfig) => void;
+  /** Called to close creator */
+  onCloseCreator?: () => void;
+  /** Called when export all is clicked */
+  onExportAll?: () => void;
 }
 
-export function ChartGallery({ headers, data }: ChartGalleryProps) {
-  const [charts, setCharts] = useState<ChartConfig[]>([]);
-  const [showCreator, setShowCreator] = useState(false);
-  const [editingChart, setEditingChart] = useState<ChartConfig | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  const handleChartCreated = (chart: ChartConfig) => {
-    if (editingChart) {
-      setCharts(charts.map(c => c.id === editingChart.id ? chart : c));
-      setEditingChart(null);
-    } else {
-      setCharts([...charts, chart]);
-    }
-    setShowCreator(false);
-  };
-
-  const handleDeleteChart = (id: string) => {
-    setCharts(charts.filter(c => c.id !== id));
-  };
-
-  const handleEditChart = (chart: ChartConfig) => {
-    setEditingChart(chart);
-    setShowCreator(true);
-  };
-
-  const handleExportAll = () => {
-    // TODO: Implement export all charts
-    console.log('Export all charts:', charts);
-    alert('Export functionality will export all charts as PNG/SVG');
-  };
+export function ChartGallery({ 
+  headers, 
+  data,
+  charts = [],
+  viewMode = 'grid',
+  showCreator = false,
+  editingChart = null,
+  isGenerating = false,
+  onViewModeChange,
+  onCreateClick,
+  onChartCreated,
+  onAIGenerate,
+  onDeleteChart,
+  onEditChart,
+  onExportChart,
+  onDuplicateChart,
+  onFullscreenChart,
+  onCloseCreator,
+  onExportAll,
+}: ChartGalleryProps) {
 
   if (showCreator) {
     return (
@@ -55,10 +76,7 @@ export function ChartGallery({ headers, data }: ChartGalleryProps) {
           </div>
           <Button
             variant="outline"
-            onClick={() => {
-              setShowCreator(false);
-              setEditingChart(null);
-            }}
+            onClick={onCloseCreator}
           >
             Back to Gallery
           </Button>
@@ -66,11 +84,10 @@ export function ChartGallery({ headers, data }: ChartGalleryProps) {
         <ChartCreator
           headers={headers}
           data={data}
-          onChartCreated={handleChartCreated}
-          onClose={() => {
-            setShowCreator(false);
-            setEditingChart(null);
-          }}
+          onChartCreated={(config, chartData) => onChartCreated?.(config, chartData)}
+          onAIGenerate={onAIGenerate}
+          isGenerating={isGenerating}
+          onClose={onCloseCreator}
         />
       </div>
     );
@@ -96,26 +113,26 @@ export function ChartGallery({ headers, data }: ChartGalleryProps) {
             <>
               <div className="flex items-center gap-1 border rounded-lg p-1">
                 <button
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => onViewModeChange?.('grid')}
                   className={`p-2 rounded ${viewMode === 'grid' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-100'}`}
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => onViewModeChange?.('list')}
                   className={`p-2 rounded ${viewMode === 'list' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-100'}`}
                 >
                   <Grid3x3 className="w-4 h-4" />
                 </button>
               </div>
-              <Button variant="outline" onClick={handleExportAll}>
+              <Button variant="outline" onClick={onExportAll}>
                 <Download className="w-4 h-4 mr-2" />
                 Export All
               </Button>
             </>
           )}
           <Button
-            onClick={() => setShowCreator(true)}
+            onClick={onCreateClick}
             className="bg-gradient-to-r from-indigo-500 to-purple-600"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -139,7 +156,7 @@ export function ChartGallery({ headers, data }: ChartGalleryProps) {
                 Create your first visualization using AI or manual controls. Get insights from your data instantly!
               </p>
               <Button
-                onClick={() => setShowCreator(true)}
+                onClick={onCreateClick}
                 className="bg-gradient-to-r from-indigo-500 to-purple-600"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -158,8 +175,11 @@ export function ChartGallery({ headers, data }: ChartGalleryProps) {
             <ChartCard
               key={chart.id}
               chart={chart}
-              onEdit={handleEditChart}
-              onDelete={handleDeleteChart}
+              onEdit={(c) => onEditChart?.(c)}
+              onDelete={(id) => onDeleteChart?.(id)}
+              onExport={onExportChart}
+              onDuplicate={onDuplicateChart}
+              onFullscreen={onFullscreenChart}
               viewMode={viewMode}
             />
           ))}

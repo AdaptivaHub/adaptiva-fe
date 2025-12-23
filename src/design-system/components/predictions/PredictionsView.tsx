@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Brain, Plus, TrendingUp, GitBranch } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { ModelCreator } from './ModelCreator';
+import { ModelCreator, type ModelTrainingRequest } from './ModelCreator';
 import { ModelCard } from './ModelCard';
 import { EmptyPredictionsState } from './EmptyPredictionsState';
 
@@ -30,29 +29,37 @@ export interface TrainedModel {
 interface PredictionsViewProps {
   headers: string[];
   data: Record<string, unknown>[];
+  /** Models to display (controlled) */
+  models?: TrainedModel[];
+  /** Whether model creator is shown (controlled) */
+  isCreating?: boolean;
+  /** Whether training is in progress */
+  isTraining?: boolean;
+  /** Called when "Create Model" is clicked */
+  onCreateClick?: () => void;
+  /** Called when training is requested */
+  onTrainModel?: (config: ModelTrainingRequest) => void;
+  /** Called when model is deleted */
+  onDeleteModel?: (modelId: string) => void;
+  /** Called when creator is cancelled */
+  onCancelCreate?: () => void;
 }
 
-export function PredictionsView({ headers, data }: PredictionsViewProps) {
-  const [models, setModels] = useState<TrainedModel[]>([]);
-  const [isCreating, setIsCreating] = useState(false);
-
-  const handleCreateModel = (model: TrainedModel) => {
-    setModels([...models, model]);
-    setIsCreating(false);
-  };
-
-  const handleDeleteModel = (modelId: string) => {
-    setModels(models.filter(m => m.id !== modelId));
-  };
-
-  const handleCancelCreate = () => {
-    setIsCreating(false);
-  };
-
+export function PredictionsView({ 
+  headers, 
+  data,
+  models = [],
+  isCreating = false,
+  isTraining = false,
+  onCreateClick,
+  onTrainModel,
+  onDeleteModel,
+  onCancelCreate,
+}: PredictionsViewProps) {
   if (models.length === 0 && !isCreating) {
     return (
       <div className="space-y-6">
-        <EmptyPredictionsState onCreateModel={() => setIsCreating(true)} />
+        <EmptyPredictionsState onCreateModel={onCreateClick ?? (() => {})} />
       </div>
     );
   }
@@ -69,7 +76,7 @@ export function PredictionsView({ headers, data }: PredictionsViewProps) {
         </div>
         {!isCreating && (
           <Button
-            onClick={() => setIsCreating(true)}
+            onClick={onCreateClick}
             className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -128,8 +135,9 @@ export function PredictionsView({ headers, data }: PredictionsViewProps) {
         <ModelCreator
           headers={headers}
           data={data}
-          onModelCreated={handleCreateModel}
-          onCancel={handleCancelCreate}
+          onTrainModel={onTrainModel ?? (() => {})}
+          isTraining={isTraining}
+          onCancel={onCancelCreate ?? (() => {})}
         />
       )}
 
@@ -141,7 +149,7 @@ export function PredictionsView({ headers, data }: PredictionsViewProps) {
               key={model.id}
               model={model}
               data={data}
-              onDelete={handleDeleteModel}
+              onDelete={onDeleteModel ?? (() => {})}
             />
           ))}
         </div>

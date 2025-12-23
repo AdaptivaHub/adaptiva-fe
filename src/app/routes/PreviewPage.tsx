@@ -46,12 +46,12 @@ export function PreviewPage() {
     : null;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Data Quality Banner */}
+    <div className="p-6 space-y-6">      {/* Data Quality Banner */}
       {qualityReport && qualityReport.qualityScore < 100 && (
         <DataQualityBanner
-          report={qualityReport}
-          onClean={() => {
+          issues={qualityReport.issues}
+          qualityScore={qualityReport.qualityScore}
+          onAction={() => {
             // TODO: Implement cleaning flow
             toast.info('Data cleaning coming soon!');
           }}

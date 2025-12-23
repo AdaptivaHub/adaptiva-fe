@@ -16,14 +16,8 @@ interface ModelCardProps {
 export function ModelCard({ model, data, onDelete }: ModelCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const getModelIcon = () => {
-    return model.type === 'linear-regression' ? TrendingUp : GitBranch;
-  };
-
-  const getModelColor = () => {
-    return model.type === 'linear-regression' ? 'indigo' : 'green';
-  };
-
+  const Icon = model.type === 'linear-regression' ? TrendingUp : GitBranch;
+  const color = model.type === 'linear-regression' ? 'indigo' : 'green';
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
@@ -33,9 +27,6 @@ export function ModelCard({ model, data, onDelete }: ModelCardProps) {
       minute: '2-digit',
     }).format(date);
   };
-
-  const Icon = getModelIcon();
-  const color = getModelColor();
 
   return (
     <Card className="overflow-hidden">

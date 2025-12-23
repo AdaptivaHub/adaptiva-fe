@@ -11,12 +11,34 @@ export * from './components/ui';
 
 // Feature Components
 export { DashboardLayout } from './components/DashboardLayout';
+export type { NavigationItem, UserInfo, FileInfo } from './components/DashboardLayout';
 export { DataPreview } from './components/DataPreview';
 export { DataQualityBanner } from './components/DataQualityBanner';
-export type { DataQualityBannerProps } from './components/DataQualityBanner';
+export type { DataQualityBannerProps, BannerIssue } from './components/DataQualityBanner';
 export { EmptyState } from './components/EmptyState';
 export type { EmptyStateProps } from './components/EmptyState';
 export { UploadZone } from './components/UploadZone';
+export type { UploadZoneProps, SampleDataset } from './components/UploadZone';
+
+// Chart Components
+export { ChartCard } from './components/charts/ChartCard';
+export { ChartCreator } from './components/charts/ChartCreator';
+export type { ChartCreationConfig } from './components/charts/ChartCreator';
+export { ChartGallery } from './components/charts/ChartGallery';
+export { ChartPreview } from './components/charts/ChartPreview';
+export { ChartSuggestions } from './components/charts/ChartSuggestions';
+export { ChartTypeSelector } from './components/charts/ChartTypeSelector';
+
+// Prediction Components
+export { ModelCreator } from './components/predictions/ModelCreator';
+export type { ModelTrainingRequest, ModelType } from './components/predictions/ModelCreator';
+export { ModelCard } from './components/predictions/ModelCard';
+export { ModelTypeSelector } from './components/predictions/ModelTypeSelector';
+export { FeatureSelector } from './components/predictions/FeatureSelector';
+export { DataValidationWarning } from './components/predictions/DataValidationWarning';
+export { EmptyPredictionsState } from './components/predictions/EmptyPredictionsState';
+export { ModelVisualization } from './components/predictions/ModelVisualization';
+export { PredictionsView } from './components/predictions/PredictionsView';
 
 // Utils (export functions, not types again)
 export { analyzeDataQuality } from './utils/dataQuality';

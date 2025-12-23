@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Menu, Upload, ChartBar, Sparkles, FileText, Settings, User, LogOut, ChevronLeft, ChevronRight, Brain, Check, X } from 'lucide-react';
+import { Menu, Upload, ChartBar, Sparkles, FileText, Settings, User, LogOut, ChevronLeft, ChevronRight, Brain } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   DropdownMenu,
@@ -10,56 +10,124 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { cn } from './ui/utils';
-import type { UploadedFile, DataQualityReport } from '../types';
+
+// Generic types for the design system
+export interface NavigationItem {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  view: string;
+  disabled?: boolean;
+  hasWarning?: boolean;
+}
+
+export interface UserInfo {
+  name: string;
+  initials: string;
+  plan?: string;
+}
+
+export interface FileInfo {
+  fileName: string;
+  rowCount: number;
+  qualityScore?: number;
+  qualityLabel?: string;
+}
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  uploadedFile: UploadedFile | null;
-  qualityReport?: DataQualityReport | null;
-  activeView?: 'upload' | 'preview' | 'charts' | 'predictions';
-  onViewChange?: (view: 'upload' | 'preview' | 'charts' | 'predictions') => void;
+  /** Current active view identifier */
+  activeView?: string;
+  /** Called when navigation item is clicked */
+  onViewChange?: (view: string) => void;
+  /** Navigation items (defaults to standard items if not provided) */
+  navigationItems?: NavigationItem[];
+  /** File info to show in sidebar */
+  fileInfo?: FileInfo | null;
+  /** User info for the user menu */
+  userInfo?: UserInfo | null;
+  /** Whether to show the upgrade button */
+  showUpgradeButton?: boolean;
+  /** Called when upgrade button is clicked */
+  onUpgradeClick?: () => void;
+  /** Called when profile is clicked */
+  onProfileClick?: () => void;
+  /** Called when settings is clicked */
+  onSettingsClick?: () => void;
+  /** Called when logout is clicked */
+  onLogoutClick?: () => void;
+  /** Header title */
+  headerTitle?: string;
+  /** Header subtitle */
+  headerSubtitle?: string;
+  /** Custom header right content */
+  headerRight?: ReactNode;
+  /** Whether sidebar is collapsed (controlled) */
+  sidebarCollapsed?: boolean;
+  /** Called when sidebar collapse state changes */
+  onSidebarCollapsedChange?: (collapsed: boolean) => void;
 }
+
+// Default navigation items for backwards compatibility
+const defaultNavigationItems: NavigationItem[] = [
+  { icon: Upload, label: 'Upload', view: 'upload', disabled: false },
+  { icon: FileText, label: 'Preview', view: 'preview', disabled: true },
+  { icon: ChartBar, label: 'Charts', view: 'charts', disabled: true },
+  { icon: Brain, label: 'Predictions', view: 'predictions', disabled: true },
+];
 
 export function DashboardLayout({ 
   children, 
-  uploadedFile, 
-  qualityReport,
   activeView = 'upload',
   onViewChange,
+  navigationItems,
+  fileInfo,
+  userInfo,
+  showUpgradeButton = true,
+  onUpgradeClick,
+  onProfileClick,
+  onSettingsClick,
+  onLogoutClick,
+  headerTitle,
+  headerSubtitle,
+  headerRight,
+  sidebarCollapsed: externalCollapsed,
+  onSidebarCollapsedChange,
 }: DashboardLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-
-  const navigationItems = [
-    { icon: Upload, label: 'Upload', view: 'upload' as const, active: activeView === 'upload', disabled: false },
-    { icon: FileText, label: 'Preview', view: 'preview' as const, active: activeView === 'preview', disabled: !uploadedFile, hasWarning: qualityReport && qualityReport.qualityScore < 90 },
-    { icon: ChartBar, label: 'Charts', view: 'charts' as const, active: activeView === 'charts', disabled: !uploadedFile },
-    { icon: Brain, label: 'Predictions', view: 'predictions' as const, active: activeView === 'predictions', disabled: !uploadedFile },
-  ];
-
-  const getQualityBadge = () => {
-    if (!qualityReport) return null;
-    
-    const { qualityScore } = qualityReport;
-    
-    if (qualityScore >= 90) {
-      return <Badge className="bg-green-500 text-white">Excellent</Badge>;
-    } else if (qualityScore >= 70) {
-      return <Badge className="bg-yellow-500 text-white">Good</Badge>;
+  // Internal state for sidebar if not controlled
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const sidebarCollapsed = externalCollapsed ?? internalCollapsed;
+  
+  const handleCollapseChange = (collapsed: boolean) => {
+    if (onSidebarCollapsedChange) {
+      onSidebarCollapsedChange(collapsed);
     } else {
-      return <Badge className="bg-red-500 text-white">Needs Cleaning</Badge>;
+      setInternalCollapsed(collapsed);
     }
   };
+
+  // Use provided navigation items or defaults
+  const navItems = navigationItems ?? defaultNavigationItems;
+
+  const getQualityBadge = (score?: number, label?: string) => {
+    if (score === undefined) return null;
+    
+    if (score >= 90) {
+      return <Badge className="bg-green-500 text-white">{label ?? 'Excellent'}</Badge>;
+    } else if (score >= 70) {
+      return <Badge className="bg-yellow-500 text-white">{label ?? 'Good'}</Badge>;
+    } else {
+      return <Badge className="bg-red-500 text-white">{label ?? 'Needs Cleaning'}</Badge>;
+    }
+  };
+
+  // Dynamic header content
+  const title = headerTitle ?? (fileInfo ? 'Data Analysis' : 'Get Started');
+  const subtitle = headerSubtitle ?? (fileInfo 
+    ? 'Analyze and visualize your data with AI' 
+    : 'Upload your CSV or Excel file to begin');
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -85,7 +153,7 @@ export function DashboardLayout({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onClick={() => handleCollapseChange(!sidebarCollapsed)}
             className="ml-auto"
           >
             {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -94,8 +162,9 @@ export function DashboardLayout({
 
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1">
-          {navigationItems.map((item, index) => {
+          {navItems.map((item, index) => {
             const Icon = item.icon;
+            const isActive = activeView === item.view;
             
             return (
               <button
@@ -103,12 +172,13 @@ export function DashboardLayout({
                 disabled={item.disabled}
                 className={cn(
                   'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left relative',
-                  item.active && !item.disabled
+                  isActive && !item.disabled
                     ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
                     : 'text-slate-700 hover:bg-slate-100',
                   item.disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent !text-slate-400 !bg-transparent',
                   item.hasWarning && !item.disabled && 'ring-2 ring-yellow-400 ring-offset-2'
-                )}                onClick={() => {
+                )}
+                onClick={() => {
                   if (!item.disabled) {
                     onViewChange?.(item.view);
                   }
@@ -119,9 +189,7 @@ export function DashboardLayout({
                   <>
                     <span className="font-medium flex-1">{item.label}</span>
                     {item.hasWarning && (
-                      <Badge className="bg-yellow-500 text-white text-xs">
-                        !
-                      </Badge>
+                      <Badge className="bg-yellow-500 text-white text-xs">!</Badge>
                     )}
                   </>
                 )}
@@ -134,21 +202,21 @@ export function DashboardLayout({
         </nav>
 
         {/* File Info (when file is uploaded) */}
-        {uploadedFile && !sidebarCollapsed && (
+        {fileInfo && !sidebarCollapsed && (
           <div className="p-3 border-t border-slate-200">
             <div className="p-3 bg-slate-50 rounded-lg">
               <p className="text-xs text-slate-500 mb-1">Current File</p>
               <p className="font-medium text-sm text-slate-900 truncate">
-                {uploadedFile.fileName}
+                {fileInfo.fileName}
               </p>
               <p className="text-xs text-slate-500 mt-1">
-                {uploadedFile.rowCount.toLocaleString()} rows
+                {fileInfo.rowCount.toLocaleString()} rows
               </p>
-              {qualityReport && (
+              {fileInfo.qualityScore !== undefined && (
                 <div className="mt-2 pt-2 border-t border-slate-200">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">Quality</span>
-                    {getQualityBadge()}
+                    {getQualityBadge(fileInfo.qualityScore, fileInfo.qualityLabel)}
                   </div>
                 </div>
               )}
@@ -159,6 +227,7 @@ export function DashboardLayout({
         {/* Settings */}
         <div className="p-3 border-t border-slate-200">
           <button
+            onClick={onSettingsClick}
             className={cn(
               'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition-all text-left'
             )}
@@ -178,59 +247,59 @@ export function DashboardLayout({
               <Menu className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">
-                {uploadedFile ? 'Data Analysis' : 'Get Started'}
-              </h1>
-              <p className="text-sm text-slate-500">
-                {uploadedFile
-                  ? 'Analyze and visualize your data with AI'
-                  : 'Upload your CSV or Excel file to begin'}
-              </p>
+              <h1 className="text-xl font-bold text-slate-900">{title}</h1>
+              <p className="text-sm text-slate-500">{subtitle}</p>
             </div>
           </div>
 
-          {/* User Menu */}
+          {/* Header Right */}
           <div className="flex items-center gap-3">
-            <Button 
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-md"
-              onClick={() => setUpgradeModalOpen(true)}
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Upgrade to Pro
-            </Button>
+            {headerRight}
+            
+            {showUpgradeButton && (
+              <Button 
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-md"
+                onClick={onUpgradeClick}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Upgrade to Pro
+              </Button>
+            )}
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2">
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-                      JD
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="text-left hidden md:block">
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-slate-500">Free Plan</p>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="w-4 h-4 mr-2" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {userInfo && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-2">
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                        {userInfo.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-left hidden md:block">
+                      <p className="text-sm font-medium">{userInfo.name}</p>
+                      {userInfo.plan && <p className="text-xs text-slate-500">{userInfo.plan}</p>}
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onProfileClick}>
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onSettingsClick}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onLogoutClick} className="text-red-600">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </header>
 
@@ -239,129 +308,6 @@ export function DashboardLayout({
           {children}
         </main>
       </div>
-
-      {/* Upgrade to Pro Modal */}
-      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden">
-          <DialogHeader className="px-6 pt-6 pb-4">
-            <DialogTitle className="text-2xl font-bold text-center">
-              Upgrade to Adaptiva Pro
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              Unlock unlimited analysis power and advanced AI features
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid md:grid-cols-2 gap-6 px-6 pb-6">
-            {/* Free Plan */}
-            <div className="border-2 border-slate-200 rounded-xl p-6 bg-white">
-              <div className="mb-4">
-                <h3 className="text-lg font-bold text-slate-900">Free Plan</h3>
-                <div className="mt-2">
-                  <span className="text-3xl font-bold text-slate-900">$0</span>
-                  <span className="text-slate-500">/month</span>
-                </div>
-                <Badge className="mt-2 bg-slate-200 text-slate-700">Current Plan</Badge>
-              </div>
-
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">Up to 10,000 rows per file</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">Basic data cleaning</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">5 charts per month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">Basic predictions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <X className="w-5 h-5 text-slate-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-400">Advanced AI insights</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <X className="w-5 h-5 text-slate-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-400">Priority support</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <X className="w-5 h-5 text-slate-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-400">Export to multiple formats</span>
-                </li>
-              </ul>
-
-              <Button variant="outline" className="w-full" disabled>
-                Current Plan
-              </Button>
-            </div>
-
-            {/* Pro Plan */}
-            <div className="border-2 border-purple-500 rounded-xl p-6 bg-gradient-to-br from-indigo-50 to-purple-50 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                POPULAR
-              </div>
-
-              <div className="mb-4">
-                <h3 className="text-lg font-bold text-slate-900">Pro Plan</h3>
-                <div className="mt-2">
-                  <span className="text-3xl font-bold text-slate-900">$29</span>
-                  <span className="text-slate-600">/month</span>
-                </div>
-                <p className="text-xs text-slate-500 mt-1">Billed monthly, cancel anytime</p>
-              </div>
-
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">Unlimited file size & rows</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">Advanced data cleaning & validation</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">Unlimited charts & visualizations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">Advanced ML predictions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">AI-powered insights & recommendations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">Priority 24/7 support</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">Export to PDF, Excel, CSV, JSON</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-900 font-medium">API access</span>
-                </li>
-              </ul>
-
-              <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Upgrade Now
-              </Button>
-
-              <p className="text-xs text-center text-slate-500 mt-3">
-                30-day money-back guarantee
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

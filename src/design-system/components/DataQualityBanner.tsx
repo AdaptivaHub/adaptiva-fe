@@ -1,51 +1,65 @@
-import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Sparkles, AlertTriangle, X, ArrowRight } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
-import type { DataQualityReport, DataQualityIssue } from '../utils/dataQuality';
 
-interface DataQualityBannerBaseProps {
-  onCleanData?: () => void;
+// Generic issue type for design system (no domain-specific semantics)
+export interface BannerIssue {
+  type: string;
+  count: number;
+  severity?: 'high' | 'medium' | 'low';
+}
+
+export interface DataQualityBannerProps {
+  /** List of issues to display */
+  issues: BannerIssue[];
+  /** Quality score (0-100) */
+  qualityScore: number;
+  /** Whether the banner is visible (controlled) */
+  isVisible?: boolean;
+  /** Custom title */
+  title?: string;
+  /** Custom description */
+  description?: ReactNode;
+  /** Custom icon */
+  icon?: ReactNode;
+  /** Primary action label */
+  actionLabel?: string;
+  /** Benefit text shown above CTA */
+  benefitText?: string;
+  /** Benefit description shown below benefit text */
+  benefitDescription?: string;
+  /** Callback when primary action is clicked */
+  onAction?: () => void;
+  /** Callback when dismiss is clicked */
   onDismiss?: () => void;
-  /** Alias for onCleanData */
+  /** @deprecated Use onAction instead */
+  onCleanData?: () => void;
+  /** @deprecated Use onAction instead */
   onClean?: () => void;
 }
 
-interface DataQualityBannerWithReport extends DataQualityBannerBaseProps {
-  report: DataQualityReport;
-  issues?: never;
-  qualityScore?: never;
-}
+export function DataQualityBanner({
+  issues,
+  qualityScore,
+  isVisible = true,
+  title = 'Data Quality Check Complete',
+  description,
+  icon,
+  actionLabel = 'Clean Data Now',
+  benefitText = '✨ Improve AI accuracy by up to 40%',
+  benefitDescription = 'Our AI-powered cleaning handles missing values, removes duplicates, and standardizes formats automatically',
+  onAction,
+  onDismiss,
+  onCleanData,
+  onClean,
+}: DataQualityBannerProps) {
+  // Support deprecated props
+  const handleAction = onAction ?? onCleanData ?? onClean;
 
-interface DataQualityBannerWithIssues extends DataQualityBannerBaseProps {
-  report?: never;
-  issues: DataQualityIssue[];
-  qualityScore: number;
-}
-
-export type DataQualityBannerProps = DataQualityBannerWithReport | DataQualityBannerWithIssues;
-
-export function DataQualityBanner(props: DataQualityBannerProps) {
-  // Extract values from either report or direct props
-  const issues = 'report' in props && props.report ? props.report.issues : props.issues!;
-  const qualityScore = 'report' in props && props.report ? props.report.qualityScore : props.qualityScore!;
-  const onCleanData = props.onCleanData ?? props.onClean;
-  const onDismiss = props.onDismiss;
-
-  const [isDismissed, setIsDismissed] = useState(false);
-
-  if (isDismissed) return null;
-
-  const handleDismiss = () => {
-    setIsDismissed(true);
-    onDismiss?.();
-  };
-
-  const handleCleanData = () => {
-    onCleanData?.();
-  };
+  if (!isVisible) return null;
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
@@ -67,11 +81,10 @@ export function DataQualityBanner(props: DataQualityBannerProps) {
       <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       
       <div className="relative">
-        <div className="flex items-start gap-4">
-          {/* Icon */}
+        <div className="flex items-start gap-4">          {/* Icon */}
           <div className="flex-shrink-0">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
+              {icon ?? <Sparkles className="w-6 h-6 text-white" />}
             </div>
           </div>
 
@@ -80,20 +93,24 @@ export function DataQualityBanner(props: DataQualityBannerProps) {
             <div className="flex items-start justify-between gap-4 mb-3">
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">
-                  Data Quality Check Complete
+                  {title}
                 </h3>
                 <p className="text-sm text-slate-600">
-                  We found <span className="font-semibold text-slate-900">{totalIssues} potential issues</span> that could affect AI analysis quality
+                  {description ?? (
+                    <>We found <span className="font-semibold text-slate-900">{totalIssues} potential issues</span> that could affect AI analysis quality</>
+                  )}
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDismiss}
-                className="text-slate-400 hover:text-slate-600 -mt-1"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+              {onDismiss && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onDismiss}
+                  className="text-slate-400 hover:text-slate-600 -mt-1"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
             </div>
 
             {/* Quality Score */}
@@ -125,23 +142,21 @@ export function DataQualityBanner(props: DataQualityBannerProps) {
                   {issue.count} {issue.type}
                 </Badge>
               ))}
-            </div>
-
-            {/* Call to Action */}
+            </div>            {/* Call to Action */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/80">
               <div className="flex-1">
                 <p className="text-sm font-medium text-slate-900 mb-1">
-                  ✨ Improve AI accuracy by up to 40%
+                  {benefitText}
                 </p>
                 <p className="text-xs text-slate-600">
-                  Our AI-powered cleaning handles missing values, removes duplicates, and standardizes formats automatically
+                  {benefitDescription}
                 </p>
               </div>
               <Button
-                onClick={handleCleanData}
+                onClick={handleAction}
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-md whitespace-nowrap"
               >
-                Clean Data Now
+                {actionLabel}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

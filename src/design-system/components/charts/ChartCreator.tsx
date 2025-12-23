@@ -27,63 +27,67 @@ export interface ChartConfig {
   createdAt: Date;
 }
 
+// Configuration for creating a new chart (without id/createdAt)
+export interface ChartCreationConfig {
+  title: string;
+  type: ChartConfig['type'];
+  xAxis?: string;
+  yAxis?: string;
+  prompt?: string;
+}
+
 interface ChartCreatorProps {
   headers: string[];
   data: Record<string, unknown>[];
-  onChartCreated: (chart: ChartConfig) => void;
+  /** Called when chart is created manually */
+  onChartCreated: (config: ChartCreationConfig, data: Record<string, unknown>[]) => void;
+  /** Called when AI generation is requested (app layer handles API call) */
+  onAIGenerate?: (prompt: string, config: ChartCreationConfig) => void;
+  /** Whether AI generation is in progress */
+  isGenerating?: boolean;
   onClose?: () => void;
+  /** Default colors for charts */
+  defaultColors?: string[];
 }
 
-export function ChartCreator({ headers, data, onChartCreated, onClose: _onClose }: ChartCreatorProps) {
+export function ChartCreator({ 
+  headers, 
+  data, 
+  onChartCreated, 
+  onAIGenerate,
+  isGenerating = false,
+}: ChartCreatorProps) {
   const [aiPrompt, setAiPrompt] = useState('');
   const [chartType, setChartType] = useState<ChartConfig['type']>('bar');
   const [xAxis, setXAxis] = useState<string>(headers[0] || '');
   const [yAxis, setYAxis] = useState<string>(headers[1] || '');
   const [chartTitle, setChartTitle] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleAIGenerate = async () => {
-    if (!aiPrompt.trim()) return;
+  const handleAIGenerate = () => {
+    if (!aiPrompt.trim() || !onAIGenerate) return;
     
-    setIsGenerating(true);
-    
-    // TODO: Call backend API for AI chart generation
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Mock AI response - parse prompt and generate chart config
-    const chart: ChartConfig = {
-      id: `chart-${Date.now()}`,
+    const config: ChartCreationConfig = {
       title: chartTitle || aiPrompt.slice(0, 50),
       type: chartType,
       xAxis,
       yAxis,
-      data,
-      colors: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'],
       prompt: aiPrompt,
-      createdAt: new Date(),
     };
     
-    onChartCreated(chart);
-    setIsGenerating(false);
-    setAiPrompt('');
+    onAIGenerate(aiPrompt, config);
   };
 
   const handleManualCreate = () => {
-    if (!xAxis || !yAxis) return;
+    if (!xAxis || (!yAxis && chartType !== 'pie')) return;
     
-    const chart: ChartConfig = {
-      id: `chart-${Date.now()}`,
+    const config: ChartCreationConfig = {
       title: chartTitle || `${yAxis} by ${xAxis}`,
       type: chartType,
       xAxis,
       yAxis,
-      data,
-      colors: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'],
-      createdAt: new Date(),
     };
     
-    onChartCreated(chart);
+    onChartCreated(config, data);
   };
 
   const handleSuggestionClick = (suggestion: { prompt: string; type: ChartConfig['type'] }) => {

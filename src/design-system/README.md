@@ -1,35 +1,43 @@
 # Design System
 
-Adaptiva's UI component library - reusable components, styles, and utilities.
+Adaptiva's UI component library - **purely presentational** components, styles, and utilities.
+
+> **Architecture Principle**: This design system contains NO business logic, API calls, navigation, or state management. All such logic belongs in the app layer (`/src/app`), stores (`/src/stores`), or backend.
+
+## Design Principles
+
+### ✅ Design System MAY:
+- Accept callbacks (`onClick`, `onSubmit`, `onChange`)
+- Manage visual state (`hover`, `focus`, `loading`, `open/closed`)
+- Handle accessibility (ARIA attributes, keyboard navigation)
+- Emit events upward (`onFileSelect(file)`, `onDismiss()`)
+
+### ❌ Design System MUST NOT:
+- Import react-router or call navigation
+- Make API calls (fetch/axios)
+- Import or mutate Zustand stores
+- Contain business logic or domain rules
+- Use browser dialogs (`confirm()`, `alert()`)
 
 ## Structure
 
 ```
 design-system/
 ├── index.ts              # Public exports
-├── types.ts              # Shared TypeScript types
+├── types.ts              # Generic UI types (not domain types)
 ├── components/
 │   ├── ui/               # Base UI primitives (shadcn/ui based)
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── input.tsx
-│   │   ├── select.tsx
-│   │   ├── progress.tsx
-│   │   ├── badge.tsx
-│   │   ├── tabs.tsx
-│   │   └── ...
-│   ├── DashboardLayout.tsx   # Main app layout with sidebar
+│   ├── charts/           # Chart visualization components
+│   ├── predictions/      # ML model UI components
+│   ├── DashboardLayout.tsx   # App shell (generic layout)
 │   ├── DataPreview.tsx       # Data table with pagination
-│   ├── DataQualityBanner.tsx # Quality issues banner
+│   ├── DataQualityBanner.tsx # Alert banner for issues
 │   ├── EmptyState.tsx        # Empty/placeholder states
 │   └── UploadZone.tsx        # File upload dropzone
 ├── styles/
-│   ├── index.css         # Main stylesheet
-│   ├── tailwind.css      # Tailwind imports
-│   ├── theme.css         # CSS variables & theming
-│   └── fonts.css         # Font definitions
+│   └── ...
 └── utils/
-    └── dataQuality.ts    # Data quality analysis utilities
+    └── dataQuality.ts    # Pure data analysis functions
 ```
 
 ## Components
@@ -54,97 +62,72 @@ Base components built on shadcn/ui and Radix UI:
 
 | Component | Description | Key Props |
 |-----------|-------------|-----------|
-| `DashboardLayout` | App shell with sidebar nav | `children` |
+| `DashboardLayout` | App shell with sidebar | `navigationItems`, `fileInfo`, `userInfo`, callbacks |
 | `DataPreview` | Paginated data table | `file`, `data`, `headers`, `onSheetChange` |
-| `DataQualityBanner` | Shows quality issues | `report` or `issues`+`qualityScore`, `onClean` |
-| `EmptyState` | Empty/welcome states | `icon`, `title`, `description`, `action` |
-| `UploadZone` | File upload dropzone | `onFileSelect`, `isLoading`, `isDragActive` |
+| `DataQualityBanner` | Alert banner with score | `issues`, `qualityScore`, `onAction`, `onDismiss` |
+| `EmptyState` | Empty/welcome states | `icon`, `title`, `description`, `onUploadClick`, `onDownloadSample` |
+| `UploadZone` | File upload dropzone | `onFileSelect`, `isLoading`, `uploadProgress`, `error` |
+| `ChartGallery` | Chart grid/list view | `charts`, `viewMode`, callbacks for CRUD |
+| `ChartCreator` | Chart creation form | `headers`, `data`, `onChartCreated`, `onAIGenerate` |
+| `ChartCard` | Individual chart display | `chart`, `onEdit`, `onDelete`, `onExport` |
+| `PredictionsView` | ML models view | `models`, `isCreating`, `onTrainModel` |
+| `ModelCreator` | Model training form | `headers`, `data`, `onTrainModel`, `isTraining` |
 
 ## Usage
 
 ### Import from index (recommended)
 ```typescript
-import { Button, Card, EmptyState } from '@design/components/EmptyState';
-// or
-import { Button } from '@/design-system';
+import { 
+  Button, 
+  Card, 
+  EmptyState, 
+  DashboardLayout,
+  ChartGallery,
+  type ChartConfig 
+} from '@/design-system';
 ```
 
-### Direct imports
+### Controlled Components Pattern
+
+All feature components are **controlled** - they receive state via props and emit events via callbacks:
+
 ```typescript
-import { Button } from '@design/components/ui/button';
-import { DashboardLayout } from '@design/components/DashboardLayout';
+// App layer controls state
+const [charts, setCharts] = useState<ChartConfig[]>([]);
+const [showCreator, setShowCreator] = useState(false);
+
+// Design system renders UI
+<ChartGallery
+  charts={charts}
+  showCreator={showCreator}
+  onCreateClick={() => setShowCreator(true)}
+  onDeleteChart={(id) => setCharts(c => c.filter(x => x.id !== id))}
+  onChartCreated={(config) => {
+    // App layer calls API, updates store, etc.
+  }}
+/>
 ```
 
 ## Types
 
-Defined in `types.ts`:
+Key types exported from the design system:
 
 ```typescript
-interface UploadedFile {
-  fileName: string;
-  rowCount: number;
-  columnCount: number;
-  sheets?: string[];
-  activeSheet?: string;
-}
+// Generic UI types
+interface NavigationItem { icon, label, view, disabled?, hasWarning? }
+interface UserInfo { name, initials, plan? }
+interface FileInfo { fileName, rowCount, qualityScore?, qualityLabel? }
+interface BannerIssue { type, count, severity? }
+interface SampleDataset { id, name, description, colorScheme }
 
-interface ChartConfig {
-  type: string;
-  data: unknown;
-  layout?: unknown;
-}
+// Chart types
+interface ChartConfig { id, title, type, xAxis?, yAxis?, data, colors?, prompt?, createdAt }
+interface ChartCreationConfig { title, type, xAxis?, yAxis?, prompt? }
 
-interface TrainedModel {
-  modelId: string;
-  targetColumn: string;
-  features: string[];
-  accuracy?: number;
-}
+// Model types  
+interface ModelTrainingRequest { name, type, targetVariable, features, trainSize, ... }
 ```
 
 ## Styling
 
-### Tailwind CSS
-All components use Tailwind CSS utility classes. Theme colors are defined as CSS variables in `styles/theme.css`.
-
-### Key Design Tokens
-- Primary: Indigo/Purple gradient (`from-indigo-500 to-purple-600`)
-- Background: Slate-50
-- Card backgrounds: White with subtle shadows
-- Text: Slate-900 (headings), Slate-600 (body)
-
-## Adding Components
-
-1. Create component in appropriate folder:
-   - `components/ui/` for base primitives
-   - `components/` for feature components
-
-2. Follow the pattern:
-```typescript
-// components/NewComponent.tsx
-import { Card } from './ui/card';
-
-export interface NewComponentProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-export function NewComponent({ title, children }: NewComponentProps) {
-  return (
-    <Card>
-      <h2>{title}</h2>
-      {children}
-    </Card>
-  );
-}
-```
-
-3. Export from `index.ts`:
-```typescript
-export { NewComponent } from './components/NewComponent';
-export type { NewComponentProps } from './components/NewComponent';
-```
-
-## Origin
-
-This design system was originally developed in `adaptiva-design` and has been integrated directly into `adaptiva-fe`. Components can be modified directly in this folder.
+Uses Tailwind CSS with custom theme variables defined in `/styles/theme.css`.

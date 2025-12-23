@@ -14,6 +14,10 @@ export interface EmptyStateProps {
   action?: ReactNode;
   /** Show the feature grid (default: true when no custom props provided) */
   showFeatures?: boolean;
+  /** Callback when "Upload Your Data" is clicked (app layer handles scroll/navigation) */
+  onUploadClick?: () => void;
+  /** Callback when "Download Sample" is clicked (app layer handles file download) */
+  onDownloadSample?: () => void;
 }
 
 export function EmptyState({
@@ -22,39 +26,14 @@ export function EmptyState({
   description,
   action,
   showFeatures,
-}: EmptyStateProps = {}) {
+  onUploadClick,
+  onDownloadSample,
+}: EmptyStateProps) {
   // If custom props provided, render a simple empty state
   const isCustom = icon !== undefined || title !== undefined || description !== undefined || action !== undefined;
   
   // Default to showing features only for the default home page state
   const shouldShowFeatures = showFeatures ?? !isCustom;
-
-  const scrollToUpload = () => {
-    const uploadElement = document.getElementById('upload-zone');
-    if (uploadElement) {
-      uploadElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
-
-  const downloadSample = () => {
-    // Create sample CSV data
-    const sampleData = `ID,Name,Email,Sales,Region,Date
-1,Customer 1,customer1@example.com,5432,North,2024-03-15
-2,Customer 2,customer2@example.com,8901,South,2024-04-22
-3,Customer 3,customer3@example.com,3210,East,2024-02-10
-4,Customer 4,customer4@example.com,7654,West,2024-05-18
-5,Customer 5,customer5@example.com,4567,North,2024-01-25`;
-
-    const blob = new Blob([sampleData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'sample-data.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  };
 
   const features = [
     {
@@ -121,13 +100,12 @@ export function EmptyState({
           Transform your data into actionable insights with AI-powered analysis,
           automatic visualizations, and intelligent predictions.
         </p>
-        
-        {/* CTA Section */}
+          {/* CTA Section */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <Button 
             size="lg"
             className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg"
-            onClick={scrollToUpload}
+            onClick={onUploadClick}
           >
             <Upload className="w-5 h-5 mr-2" />
             Upload Your Data
@@ -136,7 +114,7 @@ export function EmptyState({
             size="lg"
             variant="outline"
             className="border-slate-300 hover:bg-slate-50"
-            onClick={downloadSample}
+            onClick={onDownloadSample}
           >
             <Download className="w-5 h-5 mr-2" />
             Download Sample File

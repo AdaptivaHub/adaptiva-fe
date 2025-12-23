@@ -165,3 +165,95 @@ export interface RateLimitError {
   message: string;
 }
 
+// =============================================================================
+// Chart Types (for design system)
+// =============================================================================
+
+export interface ChartConfig {
+  id: string;
+  title: string;
+  type: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed';
+  xAxis?: string;
+  yAxis?: string | string[];
+  data: Record<string, unknown>[];
+  colors?: string[];
+  prompt?: string;
+  createdAt: Date;
+}
+
+// =============================================================================
+// ML/Prediction Types (for design system)
+// =============================================================================
+
+export interface TrainedModel {
+  id: string;
+  name: string;
+  type: 'linear-regression' | 'decision-tree';
+  targetVariable: string;
+  features: string[];
+  metrics: {
+    r2?: number;
+    mae?: number;
+    rmse?: number;
+    accuracy?: number;
+    crossValScores?: number[];
+  };
+  coefficients?: Record<string, number>;
+  featureImportance?: Record<string, number>;
+  confusionMatrix?: number[][];
+  trainedAt: Date;
+  dataPoints: number;
+  testSize: number;
+}
+
+export interface ModelTrainingConfig {
+  name?: string;
+  type: 'linear-regression' | 'decision-tree';
+  targetVariable: string;
+  features: string[];
+  trainSize: number;
+  maxDepth?: number;
+  useCrossValidation: boolean;
+}
+
+// =============================================================================
+// Data Quality Types (for design system)
+// =============================================================================
+
+export interface DataQualityIssue {
+  type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+  count: number;
+  severity: 'high' | 'medium' | 'low';
+}
+
+export interface ColumnIssue {
+  column: string;
+  issues: {
+    type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+    count: number;
+    percentage: number;
+  }[];
+}
+
+export interface DataQualityReport {
+  qualityScore: number;
+  totalRows: number;
+  cleanRows: number;
+  issues: DataQualityIssue[];
+  columnIssues: ColumnIssue[];
+}
+
+// =============================================================================
+// File Types (for design system - generic)
+// =============================================================================
+
+export interface UploadedFile {
+  fileName: string;
+  rowCount: number;
+  columnCount?: number;
+  sheets?: string[];
+  activeSheet?: string;
+  headers?: string[];
+  data?: Record<string, unknown>[];
+}
+

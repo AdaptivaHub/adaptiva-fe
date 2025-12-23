@@ -13,9 +13,7 @@ import { toast } from 'sonner';
 export function UploadPage() {
   const navigate = useNavigate();
   const metadata = useFileStore((state) => state.metadata);
-  const clearFile = useFileStore((state) => state.clearFile);
-
-  const { uploadFile, isUploading, error } = useFileUpload({
+  const clearFile = useFileStore((state) => state.clearFile);  const { uploadFile, isUploading, error } = useFileUpload({
     onSuccess: () => {
       toast.success('File uploaded successfully!');
       navigate('/preview');
@@ -35,16 +33,12 @@ export function UploadPage() {
     uploadFile(file);
   }, [uploadFile, metadata, clearFile]);
 
-  // Show error toast if upload fails
-  if (error) {
-    toast.error(error);
-  }
-
   return (
     <div className="p-6" {...dragProps}>
       <UploadZone
         onFileSelect={handleFileSelect}
         isLoading={isUploading}
+        error={error || undefined}
         isDragActive={isDragActive}
       />
       {metadata && (

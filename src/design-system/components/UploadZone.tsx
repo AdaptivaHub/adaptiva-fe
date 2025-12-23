@@ -4,28 +4,64 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { cn } from './ui/utils';
-import type { UploadedFile } from '../types';
 
-interface UploadZoneProps {
-  /** Called when a file is processed (demo mode with mock data) */
-  onFileUpload?: (file: UploadedFile) => void;
-  /** Called when a raw file is selected (for custom upload handling) */
-  onFileSelect?: (file: File) => void;
-  /** External loading state */
-  isLoading?: boolean;
-  /** External drag state */
-  isDragActive?: boolean;
+// Generic sample dataset definition (no business logic)
+export interface SampleDataset {
+  id: string;
+  name: string;
+  description: string;
+  colorScheme: 'blue' | 'green' | 'purple' | 'orange' | 'pink';
 }
 
-export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoading, isDragActive: externalDragActive }: UploadZoneProps) {
+export interface UploadZoneProps {
+  /** Called when a file is selected (app layer handles upload) */
+  onFileSelect?: (file: File) => void;
+  /** External loading/uploading state */
+  isLoading?: boolean;
+  /** Upload progress (0-100) */
+  uploadProgress?: number;
+  /** Current file name being uploaded */
+  uploadingFileName?: string;
+  /** Error message to display */
+  error?: string | null;
+  /** Called when error is dismissed */
+  onErrorDismiss?: () => void;
+  /** External drag active state */
+  isDragActive?: boolean;
+  /** Sample datasets to show (optional) */
+  sampleDatasets?: SampleDataset[];
+  /** Called when a sample dataset is selected */
+  onSampleSelect?: (dataset: SampleDataset) => void;
+  /** Accepted file types */
+  acceptedTypes?: string;
+  /** Max file size in bytes */
+  maxFileSize?: number;
+  /** Max file size display text */
+  maxFileSizeText?: string;
+}
+
+const colorSchemes = {
+  blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+  green: { bg: 'bg-green-100', text: 'text-green-600' },
+  purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
+  orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
+  pink: { bg: 'bg-pink-100', text: 'text-pink-600' },
+};
+
+export function UploadZone({ 
+  onFileSelect, 
+  isLoading = false,
+  uploadProgress = 0,
+  uploadingFileName,
+  error,
+  onErrorDismiss,
+  isDragActive: externalDragActive,
+  sampleDatasets = [],
+  onSampleSelect,
+  acceptedTypes = '.csv,.xlsx,.xls',
+  maxFileSizeText = 'Max file size: 10MB',
+}: UploadZoneProps) {  // Internal drag state (can be overridden by external)
   const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  
-  // Use external states if provided
-  const isProcessing = externalLoading ?? isUploading;
   const isDragActiveState = externalDragActive ?? isDragging;
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -38,127 +74,32 @@ export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoad
     setIsDragging(false);
   }, []);
 
-  const processFile = useCallback(
-    async (file: File) => {
-      setError(null);
-      setUploadedFileName(file.name);
-
-      // Validate file type
-      const validTypes = [
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      ];
-      if (!validTypes.includes(file.type) && !file.name.match(/\.(csv|xlsx|xls)$/i)) {
-        setError('Invalid file type. Please upload a CSV or Excel file.');
-        return;
-      }
-
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size exceeds 10MB limit.');
-        return;
-      }
-
-      // If onFileSelect is provided, use it (real upload mode)
-      if (onFileSelect) {
-        onFileSelect(file);
-        return;
-      }
-
-      // Otherwise, use demo mode with mock data
-      setIsUploading(true);
-      setUploadProgress(0);
-
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
-
-      try {
-        // TODO: Replace with actual API call to your backend
-        // const formData = new FormData();
-        // formData.append('file', file);
-        // const response = await fetch('/api/upload', {
-        //   method: 'POST',
-        //   body: formData,
-        // });
-        // const data = await response.json();
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Mock data for demo with intentional quality issues
-        const mockHeaders = ['ID', 'Name', 'Email', 'Sales', 'Region', 'Date'];
-        const mockData = Array.from({ length: 150 }, (_, i) => ({
-          ID: i + 1,
-          Name: i % 10 === 0 ? null : `Customer ${i + 1}`, // 10% missing names
-          Email: i % 15 === 0 ? '' : `customer${i + 1}@example.com`, // Some missing emails
-          Sales: i % 8 === 0 ? null : Math.floor(Math.random() * 10000) + 1000, // Some missing sales
-          Region: ['North', 'South', 'East', 'West', null][Math.floor(Math.random() * 5)], // Some null regions
-          Date: i % 12 === 0 ? null : new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-        }));
-
-        clearInterval(progressInterval);
-        setUploadProgress(100);
-
-        // Simulate processing delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const uploadedFile: UploadedFile = {
-          fileName: file.name,
-          sheets: file.name.endsWith('.xlsx') ? ['Sheet1', 'Sales Data', 'Summary'] : undefined,
-          activeSheet: file.name.endsWith('.xlsx') ? 'Sheet1' : undefined,
-          headers: mockHeaders,
-          data: mockData,
-          rowCount: mockData.length,
-        };
-
-        onFileUpload?.(uploadedFile);
-      } catch (err) {
-        clearInterval(progressInterval);
-        setError(err instanceof Error ? err.message : 'Failed to upload file');
-        setIsUploading(false);
-      }
-    },
-    [onFileUpload]
-  );
-
   const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
+    (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
 
       const files = Array.from(e.dataTransfer.files);
-      if (files.length > 0) {
-        await processFile(files[0]);
+      if (files.length > 0 && onFileSelect) {
+        onFileSelect(files[0]);
       }
     },
-    [processFile]
+    [onFileSelect]
   );
 
   const handleFileSelect = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
-      if (files && files.length > 0) {
-        await processFile(files[0]);
+      if (files && files.length > 0 && onFileSelect) {
+        onFileSelect(files[0]);
       }
+      // Reset input so same file can be selected again
+      e.target.value = '';
     },
-    [processFile]
+    [onFileSelect]
   );
 
-  const handleClearError = () => {
-    setError(null);
-    setIsUploading(false);
-    setUploadProgress(0);
-    setUploadedFileName(null);
-  };
+  const isComplete = uploadProgress === 100;
 
   return (
     <div className="space-y-4" id="upload-zone">
@@ -167,14 +108,14 @@ export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoad
         className={cn(
           'relative overflow-hidden transition-all duration-200 upload-pulse',
           isDragActiveState && 'ring-2 ring-indigo-500 ring-offset-2',
-          isProcessing && 'pointer-events-none'
+          isLoading && 'pointer-events-none'
         )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         <div className="p-12">
-          {!isProcessing ? (
+          {!isLoading ? (
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-4">
                 <Upload className="w-8 h-8 text-indigo-600" />
@@ -190,7 +131,7 @@ export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoad
                 type="file"
                 id="file-upload"
                 className="hidden"
-                accept=".csv,.xlsx,.xls"
+                accept={acceptedTypes}
                 onChange={handleFileSelect}
               />
               <Button asChild className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700">
@@ -212,29 +153,33 @@ export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoad
                     XLSX
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">Max file size: 10MB</p>
+                <p className="text-xs text-slate-400 mt-2">{maxFileSizeText}</p>
               </div>
             </div>
           ) : (
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-4">
-                {uploadProgress === 100 ? (
+                {isComplete ? (
                   <CircleCheck className="w-8 h-8 text-green-600" />
                 ) : (
                   <Upload className="w-8 h-8 text-indigo-600 animate-pulse" />
                 )}
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                {uploadProgress === 100 ? 'Upload Complete!' : 'Uploading...'}
+                {isComplete ? 'Upload Complete!' : 'Uploading...'}
               </h3>
-              <p className="text-sm text-slate-500 mb-6">{uploadedFileName}</p>
+              {uploadingFileName && (
+                <p className="text-sm text-slate-500 mb-6">{uploadingFileName}</p>
+              )}
               <div className="max-w-md mx-auto">
                 <Progress value={uploadProgress} className="h-2" />
                 <p className="text-xs text-slate-500 mt-2">{uploadProgress}%</p>
               </div>
             </div>
           )}
-        </div>        {/* Drag overlay */}
+        </div>
+
+        {/* Drag overlay */}
         {isDragActiveState && (
           <div className="absolute inset-0 bg-indigo-50/80 backdrop-blur-sm flex items-center justify-center border-2 border-dashed border-indigo-400">
             <div className="text-center">
@@ -254,56 +199,45 @@ export function UploadZone({ onFileUpload, onFileSelect, isLoading: externalLoad
               <h4 className="font-semibold text-red-900 text-sm">Upload Failed</h4>
               <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearError}
-              className="text-red-600 hover:text-red-700 hover:bg-red-100"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            {onErrorDismiss && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onErrorDismiss}
+                className="text-red-600 hover:text-red-700 hover:bg-red-100"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </Card>
       )}
 
       {/* Sample Datasets */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-dashed">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <FileSpreadsheet className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="font-medium text-sm text-slate-900">Sales Data</p>
-              <p className="text-xs text-slate-500">Sample dataset</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-dashed">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-              <FileSpreadsheet className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="font-medium text-sm text-slate-900">Customer List</p>
-              <p className="text-xs text-slate-500">Sample dataset</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-dashed">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <FileSpreadsheet className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="font-medium text-sm text-slate-900">Inventory</p>
-              <p className="text-xs text-slate-500">Sample dataset</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+      {sampleDatasets.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {sampleDatasets.map((dataset) => {
+            const colors = colorSchemes[dataset.colorScheme] || colorSchemes.blue;
+            return (
+              <Card 
+                key={dataset.id}
+                className="p-4 hover:shadow-md transition-shadow cursor-pointer border-dashed"
+                onClick={() => onSampleSelect?.(dataset)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', colors.bg)}>
+                    <FileSpreadsheet className={cn('w-5 h-5', colors.text)} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm text-slate-900">{dataset.name}</p>
+                    <p className="text-xs text-slate-500">{dataset.description}</p>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
