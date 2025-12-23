@@ -25,28 +25,26 @@ import type { UploadedFile, DataQualityReport } from '../types';
 interface DashboardLayoutProps {
   children: ReactNode;
   uploadedFile: UploadedFile | null;
-  onNewUpload: () => void;
   qualityReport?: DataQualityReport | null;
-  activeView?: 'preview' | 'charts' | 'predictions';
-  onViewChange?: (view: 'preview' | 'charts' | 'predictions') => void;
+  activeView?: 'upload' | 'preview' | 'charts' | 'predictions';
+  onViewChange?: (view: 'upload' | 'preview' | 'charts' | 'predictions') => void;
 }
 
 export function DashboardLayout({ 
   children, 
   uploadedFile, 
-  onNewUpload, 
   qualityReport,
-  activeView = 'preview',
+  activeView = 'upload',
   onViewChange,
 }: DashboardLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
   const navigationItems = [
-    { icon: Upload, label: 'Upload', active: !uploadedFile, disabled: false },
-    { icon: FileText, label: 'Preview', active: activeView === 'preview', disabled: !uploadedFile, hasWarning: qualityReport && qualityReport.qualityScore < 90 },
-    { icon: ChartBar, label: 'Charts', active: activeView === 'charts', disabled: !uploadedFile },
-    { icon: Brain, label: 'Predictions', active: activeView === 'predictions', disabled: !uploadedFile },
+    { icon: Upload, label: 'Upload', view: 'upload' as const, active: activeView === 'upload', disabled: false },
+    { icon: FileText, label: 'Preview', view: 'preview' as const, active: activeView === 'preview', disabled: !uploadedFile, hasWarning: qualityReport && qualityReport.qualityScore < 90 },
+    { icon: ChartBar, label: 'Charts', view: 'charts' as const, active: activeView === 'charts', disabled: !uploadedFile },
+    { icon: Brain, label: 'Predictions', view: 'predictions' as const, active: activeView === 'predictions', disabled: !uploadedFile },
   ];
 
   const getQualityBadge = () => {
@@ -110,13 +108,9 @@ export function DashboardLayout({
                     : 'text-slate-700 hover:bg-slate-100',
                   item.disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent !text-slate-400 !bg-transparent',
                   item.hasWarning && !item.disabled && 'ring-2 ring-yellow-400 ring-offset-2'
-                )}
-                onClick={() => {
-                  if (item.label === 'Upload' && uploadedFile) {
-                    onNewUpload();
-                  }
-                  if (item.label === 'Preview' || item.label === 'Charts' || item.label === 'Predictions') {
-                    onViewChange?.(item.label.toLowerCase() as 'preview' | 'charts' | 'predictions');
+                )}                onClick={() => {
+                  if (!item.disabled) {
+                    onViewChange?.(item.view);
                   }
                 }}
               >

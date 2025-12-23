@@ -4,6 +4,7 @@
 
 export { DashboardPage } from './DashboardPage';
 export { UploadPage } from './UploadPage';
+export { PreviewPage } from './PreviewPage';
 export { ChartsPage } from './ChartsPage';
 export { PredictionsPage } from './PredictionsPage';
 export { SettingsPage } from './SettingsPage';

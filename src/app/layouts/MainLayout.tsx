@@ -41,17 +41,22 @@ export function MainLayout() {
     : null;
 
   // Determine active view from current route
-  const getActiveView = (): 'preview' | 'charts' | 'predictions' => {
+  const getActiveView = (): 'upload' | 'preview' | 'charts' | 'predictions' => {
+    if (location.pathname === '/upload') return 'upload';
+    if (location.pathname === '/preview') return 'preview';
     if (location.pathname === '/charts') return 'charts';
     if (location.pathname === '/predictions') return 'predictions';
-    return 'preview';
+    return 'upload';
   };
 
   // Handle view changes from DashboardLayout navigation
-  const handleViewChange = (view: 'preview' | 'charts' | 'predictions') => {
+  const handleViewChange = (view: 'upload' | 'preview' | 'charts' | 'predictions') => {
     switch (view) {
-      case 'preview':
+      case 'upload':
         navigate('/upload');
+        break;
+      case 'preview':
+        navigate('/preview');
         break;
       case 'charts':
         navigate('/charts');
@@ -62,18 +67,12 @@ export function MainLayout() {
     }
   };
 
-  // Handle new upload request
-  const handleNewUpload = () => {
-    navigate('/upload');
-  };
-
   // TODO: Get quality report from file store or compute it
   const qualityReport: DataQualityReport | null = null;
 
   return (
     <DashboardLayout
       uploadedFile={uploadedFile}
-      onNewUpload={handleNewUpload}
       qualityReport={qualityReport}
       activeView={getActiveView()}
       onViewChange={handleViewChange}

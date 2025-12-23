@@ -13,6 +13,7 @@ import { MainLayout, AuthLayout } from './layouts';
 import {
   DashboardPage,
   UploadPage,
+  PreviewPage,
   ChartsPage,
   PredictionsPage,
   SettingsPage,
@@ -57,12 +58,11 @@ export function App() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-        </Route>
-
-        {/* Protected routes */}
+        </Route>        {/* Protected routes */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/upload" element={<UploadPage />} />
+          <Route path="/preview" element={<PreviewPage />} />
           <Route path="/charts" element={<ChartsPage />} />
           <Route path="/predictions" element={<PredictionsPage />} />
           <Route path="/settings" element={<SettingsPage />} />

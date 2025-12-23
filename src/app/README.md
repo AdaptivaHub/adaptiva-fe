@@ -14,6 +14,7 @@ app/
 └── routes/           # Page components
     ├── DashboardPage.tsx
     ├── UploadPage.tsx
+    ├── PreviewPage.tsx
     ├── ChartsPage.tsx
     ├── PredictionsPage.tsx
     ├── SettingsPage.tsx
@@ -27,7 +28,8 @@ app/
 | Path | Page | Layout | Description |
 |------|------|--------|-------------|
 | `/` | `DashboardPage` | Main | Home/overview dashboard |
-| `/upload` | `UploadPage` | Main | File upload and data preview |
+| `/upload` | `UploadPage` | Main | File upload zone |
+| `/preview` | `PreviewPage` | Main | Data preview and quality analysis |
 | `/charts` | `ChartsPage` | Main | AI chart generation |
 | `/predictions` | `PredictionsPage` | Main | ML predictions |
 | `/settings` | `SettingsPage` | Main | User settings |
