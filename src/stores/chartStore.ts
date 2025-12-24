@@ -4,18 +4,10 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { ChartConfig } from '@design/components/charts/ChartCreator';
 
-export interface ChartConfig {
-  id: string;
-  title: string;
-  type: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed';
-  xAxis?: string;
-  yAxis?: string | string[];
-  data: Record<string, unknown>[];
-  colors?: string[];
-  prompt?: string;
-  createdAt: Date;
-}
+// Re-export for convenience
+export type { ChartConfig } from '@design/components/charts/ChartCreator';
 
 interface ChartState {
   charts: ChartConfig[];

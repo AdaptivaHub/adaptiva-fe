@@ -4,9 +4,10 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { ChartTypeSelector } from './ChartTypeSelector';
+import { ChartTypeSelector, type ChartType } from './ChartTypeSelector';
 import { ChartPreview } from './ChartPreview';
 import { ChartSuggestions } from './ChartSuggestions';
+import { type PlotlyJson } from './PlotlyChartRenderer';
 import {
   Select,
   SelectContent,
@@ -15,16 +16,22 @@ import {
   SelectValue,
 } from '../ui/select';
 
+// Re-export types for convenience
+export type { ChartType } from './ChartTypeSelector';
+export type { PlotlyJson } from './PlotlyChartRenderer';
+
 export interface ChartConfig {
   id: string;
   title: string;
-  type: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed';
+  type: ChartType;
   xAxis?: string;
   yAxis?: string | string[];
   data: Record<string, unknown>[];
   colors?: string[];
   prompt?: string;
   createdAt: Date;
+  /** Pre-rendered Plotly JSON from backend */
+  plotlyJson?: PlotlyJson | null;
 }
 
 // Configuration for creating a new chart (without id/createdAt)

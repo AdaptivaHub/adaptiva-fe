@@ -1,11 +1,12 @@
 import { Lightbulb, TrendingUp, PieChart, BarChart3 } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
+import type { ChartType } from './ChartTypeSelector';
 
 interface ChartSuggestionsProps {
   headers: string[];
   data: Record<string, unknown>[];
-  onSuggestionClick: (suggestion: { prompt: string; type: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed' }) => void;
+  onSuggestionClick: (suggestion: { prompt: string; type: ChartType }) => void;
 }
 
 export function ChartSuggestions({ headers, data, onSuggestionClick }: ChartSuggestionsProps) {
@@ -47,7 +48,7 @@ export function ChartSuggestions({ headers, data, onSuggestionClick }: ChartSugg
 }
 
 function generateSuggestions(headers: string[], data: Record<string, unknown>[]) {
-  const suggestions: Array<{ prompt: string; type: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed' }> = [];
+  const suggestions: Array<{ prompt: string; type: ChartType }> = [];
 
   // Analyze column types
   const numericColumns = headers.filter(header => 
@@ -84,6 +85,14 @@ function generateSuggestions(headers: string[], data: Record<string, unknown>[])
     });
   }
 
+  // Distribution histogram for numeric columns
+  if (numericColumns.length > 0) {
+    suggestions.push({
+      prompt: `Distribution of ${numericColumns[0]}`,
+      type: 'histogram',
+    });
+  }
+
   // Correlation
   if (numericColumns.length >= 2) {
     suggestions.push({
@@ -92,7 +101,7 @@ function generateSuggestions(headers: string[], data: Record<string, unknown>[])
     });
   }
 
-  return suggestions.slice(0, 3); // Limit to 3 suggestions
+  return suggestions.slice(0, 4); // Limit to 4 suggestions
 }
 
 function getSuggestionIcon(type: string) {

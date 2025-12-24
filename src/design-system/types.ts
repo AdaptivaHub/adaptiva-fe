@@ -4,6 +4,10 @@
 // Re-export data quality types from the canonical source
 export type { DataQualityIssue, ColumnIssue, DataQualityReport } from './utils/dataQuality';
 
+// Re-export chart types from the canonical sources
+export type { ChartConfig, PlotlyJson } from './components/charts/ChartCreator';
+export type { ChartType } from './components/charts/ChartTypeSelector';
+
 /**
  * File info for layout/navigation components (minimal)
  */
@@ -16,18 +20,6 @@ export interface UploadedFile {
   // These are optional - components that need them will have them passed separately
   headers?: string[];
   data?: Record<string, unknown>[];
-}
-
-export interface ChartConfig {
-  id: string;
-  title: string;
-  type: 'line' | 'bar' | 'area' | 'pie' | 'scatter' | 'radar';
-  xAxis: string;
-  yAxis?: string;
-  color?: string;
-  showLegend?: boolean;
-  showGrid?: boolean;
-  createdAt: Date;
 }
 
 export interface TrainedModel {

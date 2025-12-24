@@ -1,9 +1,14 @@
-import { BarChart3, LineChart, PieChart, ScatterChart, AreaChart, TrendingUp } from 'lucide-react';
+import { BarChart3, LineChart, PieChart, ScatterChart, AreaChart, BarChart2, BoxSelect, Grid3x3 } from 'lucide-react';
 import { cn } from '../ui/utils';
 
+/** Chart types supported by the system - aligned with ChartSpec */
+export type ChartType = 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'histogram' | 'box' | 'heatmap';
+
 interface ChartTypeSelectorProps {
-  value: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed';
-  onChange: (type: 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'composed') => void;
+  value: ChartType;
+  onChange: (type: ChartType) => void;
+  /** Subset of types to show (optional) */
+  allowedTypes?: ChartType[];
 }
 
 const chartTypes = [
@@ -12,13 +17,19 @@ const chartTypes = [
   { type: 'area' as const, label: 'Area', icon: AreaChart },
   { type: 'pie' as const, label: 'Pie', icon: PieChart },
   { type: 'scatter' as const, label: 'Scatter', icon: ScatterChart },
-  { type: 'composed' as const, label: 'Combo', icon: TrendingUp },
+  { type: 'histogram' as const, label: 'Histogram', icon: BarChart2 },
+  { type: 'box' as const, label: 'Box Plot', icon: BoxSelect },
+  { type: 'heatmap' as const, label: 'Heatmap', icon: Grid3x3 },
 ];
 
-export function ChartTypeSelector({ value, onChange }: ChartTypeSelectorProps) {
+export function ChartTypeSelector({ value, onChange, allowedTypes }: ChartTypeSelectorProps) {
+  const displayTypes = allowedTypes 
+    ? chartTypes.filter(ct => allowedTypes.includes(ct.type))
+    : chartTypes;
+
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {chartTypes.map(({ type, label, icon: Icon }) => (
+    <div className="grid grid-cols-4 gap-2">
+      {displayTypes.map(({ type, label, icon: Icon }) => (
         <button
           key={type}
           onClick={() => onChange(type)}

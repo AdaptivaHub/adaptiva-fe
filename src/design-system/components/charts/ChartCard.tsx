@@ -10,6 +10,7 @@ import {
 } from '../ui/dropdown-menu';
 import { ChartPreview } from './ChartPreview';
 import type { ChartConfig } from './ChartCreator';
+import type { ChartType } from './ChartTypeSelector';
 import { format } from 'date-fns';
 
 interface ChartCardProps {
@@ -53,14 +54,16 @@ export function ChartCard({
     onFullscreen?.(chart);
   };
 
-  const getChartTypeBadgeColor = (type: ChartConfig['type']) => {
-    const colors = {
+  const getChartTypeBadgeColor = (type: ChartType) => {
+    const colors: Record<ChartType, string> = {
       bar: 'bg-blue-100 text-blue-700 border-blue-200',
       line: 'bg-green-100 text-green-700 border-green-200',
       area: 'bg-purple-100 text-purple-700 border-purple-200',
       pie: 'bg-orange-100 text-orange-700 border-orange-200',
       scatter: 'bg-pink-100 text-pink-700 border-pink-200',
-      composed: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      histogram: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+      box: 'bg-teal-100 text-teal-700 border-teal-200',
+      heatmap: 'bg-red-100 text-red-700 border-red-200',
     };
     return colors[type] || 'bg-slate-100 text-slate-700 border-slate-200';
   };
@@ -68,14 +71,16 @@ export function ChartCard({
   if (viewMode === 'list') {
     return (
       <Card className="p-4 hover:shadow-md transition-all group">
-        <div className="flex items-center gap-4">
-          <div className="w-48 h-32 flex-shrink-0 bg-slate-50 rounded-lg overflow-hidden">
+        <div className="flex items-center gap-4">          <div className="w-48 h-32 flex-shrink-0 bg-slate-50 rounded-lg overflow-hidden">
             <ChartPreview
               type={chart.type}
               xAxis={chart.xAxis}
               yAxis={chart.yAxis}
               data={chart.data.slice(0, 10)}
               colors={chart.colors}
+              plotlyJson={chart.plotlyJson}
+              height={128}
+              compact={true}
             />
           </div>
           <div className="flex-1 min-w-0">
@@ -190,9 +195,7 @@ export function ChartCard({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-
-        {/* Chart Preview */}
+        </div>        {/* Chart Preview */}
         <div className="bg-slate-50 rounded-lg p-4 min-h-[300px]">
           <ChartPreview
             type={chart.type}
@@ -200,6 +203,8 @@ export function ChartCard({
             yAxis={chart.yAxis}
             data={chart.data.slice(0, 20)}
             colors={chart.colors}
+            plotlyJson={chart.plotlyJson}
+            height={280}
           />
         </div>
 
