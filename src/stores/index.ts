@@ -17,8 +17,6 @@ export {
   useModels, 
   useIsCreatingModel, 
   useIsTrainingModel,
-  type TrainedModel,
-  type ModelTrainingConfig 
 } from './predictionStore';
 export { 
   useQualityStore, 

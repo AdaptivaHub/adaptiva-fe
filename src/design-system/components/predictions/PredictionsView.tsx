@@ -1,30 +1,10 @@
 import { Brain, Plus, TrendingUp, GitBranch } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { ModelCreator, type ModelTrainingRequest } from './ModelCreator';
+import { ModelCreator } from './ModelCreator';
 import { ModelCard } from './ModelCard';
 import { EmptyPredictionsState } from './EmptyPredictionsState';
-
-export interface TrainedModel {
-  id: string;
-  name: string;
-  type: 'linear-regression' | 'decision-tree';
-  targetVariable: string;
-  features: string[];
-  metrics: {
-    r2?: number;
-    mae?: number;
-    rmse?: number;
-    accuracy?: number;
-    crossValScores?: number[];
-  };
-  coefficients?: Record<string, number>;
-  featureImportance?: Record<string, number>;
-  confusionMatrix?: number[][];
-  trainedAt: Date;
-  dataPoints: number;
-  testSize: number;
-}
+import type { TrainedModel, ModelTrainingRequest } from '@/types';
 
 interface PredictionsViewProps {
   headers: string[];

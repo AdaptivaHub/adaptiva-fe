@@ -4,37 +4,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-export interface TrainedModel {
-  id: string;
-  name: string;
-  type: 'linear-regression' | 'decision-tree';
-  targetVariable: string;
-  features: string[];
-  metrics: {
-    r2?: number;
-    mae?: number;
-    rmse?: number;
-    accuracy?: number;
-    crossValScores?: number[];
-  };
-  coefficients?: Record<string, number>;
-  featureImportance?: Record<string, number>;
-  confusionMatrix?: number[][];
-  trainedAt: Date;
-  dataPoints: number;
-  testSize: number;
-}
-
-export interface ModelTrainingConfig {
-  name?: string;
-  type: 'linear-regression' | 'decision-tree';
-  targetVariable: string;
-  features: string[];
-  trainSize: number;
-  maxDepth?: number;
-  useCrossValidation: boolean;
-}
+import type { TrainedModel } from '@/types';
 
 interface PredictionState {
   models: TrainedModel[];

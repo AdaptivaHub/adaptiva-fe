@@ -6,8 +6,8 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Path aliases */
-    "baseUrl": "..",
+    /* Path aliases - baseUrl is relative to this file's location */
+    "baseUrl": "../..",
     "paths": {
       "@/*": ["./src/*"],
       "@design/*": ["./src/design-system/*"]
@@ -27,5 +27,5 @@
     "noImplicitAny": false,
     "verbatimModuleSyntax": false
   },
-  "include": ["./**/*.ts", "./**/*.tsx"]
+  "include": ["./**/*.ts", "./**/*.tsx", "../types/**/*.ts"]
 }

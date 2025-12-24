@@ -1,52 +1,82 @@
 /**
  * Predictions Page - ML predictions and model training
+ * Uses PredictionsView component with store integration
  */
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFileStore } from '@/stores';
-import { usePredict } from '@/hooks/api';
+import { useFileStore, usePredictionStore } from '@/stores';
+import { useTrainModel } from '@/hooks/api';
+import { PredictionsView } from '@design/components/predictions';
 import { Button } from '@design/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@design/components/ui/card';
-import { Input } from '@design/components/ui/input';
-import { Label } from '@design/components/ui/label';
 import { EmptyState } from '@design/components/EmptyState';
-import { Brain, Sparkles, Upload, Loader2 } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import type { ModelTrainingRequest } from '@/types';
 
 export function PredictionsPage() {
   const navigate = useNavigate();
+  
+  // File store state
   const metadata = useFileStore((state) => state.metadata);
   const data = useFileStore((state) => state.data);
+  const headers = useFileStore((state) => state.headers);
   const hasFile = metadata !== null;
+  
+  // Prediction store state & actions
+  const models = usePredictionStore((state) => state.models);
+  const isCreating = usePredictionStore((state) => state.isCreating);
+  const isTraining = usePredictionStore((state) => state.isTraining);
+  const addModel = usePredictionStore((state) => state.addModel);
+  const deleteModel = usePredictionStore((state) => state.deleteModel);
+  const setCreating = usePredictionStore((state) => state.setCreating);
+  const setTraining = usePredictionStore((state) => state.setTraining);
+  
+  // Training hook
+  const { trainModel, error: trainError } = useTrainModel();
 
-  const { predict, loading, result, error } = usePredict();
+  // Handlers
+  const handleCreateClick = useCallback(() => {
+    setCreating(true);
+  }, [setCreating]);
 
-  const [instructions, setInstructions] = useState('');
+  const handleCancelCreate = useCallback(() => {
+    setCreating(false);
+  }, [setCreating]);
 
-  const handlePredict = useCallback(async () => {
-    if (!data.length) {
-      toast.error('No data available for predictions');
+  const handleTrainModel = useCallback(async (config: ModelTrainingRequest) => {
+    if (!metadata?.fileId) {
+      toast.error('No file loaded');
       return;
     }
-
-    const predictionResult = await predict(data, instructions || undefined);
-
-    if (predictionResult) {
-      toast.success('Predictions generated successfully!');
-    } else if (error) {
-      toast.error(error);
+    
+    setTraining(true);
+    
+    const trainedModel = await trainModel(metadata.fileId, config, data.length);
+    
+    if (trainedModel) {
+      addModel(trainedModel);
+      toast.success(`Model "${config.name}" trained successfully!`);
+    } else {
+      toast.error(trainError || 'Training failed');
     }
-  }, [data, instructions, predict, error]);
+    
+    setTraining(false);
+  }, [metadata?.fileId, data.length, trainModel, trainError, addModel, setTraining]);
 
-  // No file uploaded
+  const handleDeleteModel = useCallback((modelId: string) => {
+    deleteModel(modelId);
+    toast.success('Model deleted');
+  }, [deleteModel]);
+
+  // No file uploaded - show empty state
   if (!hasFile) {
     return (
       <div className="p-6">
         <EmptyState
           icon={<Upload className="w-12 h-12" />}
           title="No Data Available"
-          description="Upload a file first to generate ML predictions."
+          description="Upload a file first to train ML prediction models."
           action={
             <Button
               onClick={() => navigate('/upload')}
@@ -62,85 +92,18 @@ export function PredictionsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Prediction Generator Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-600" />
-            AI Predictions
-          </CardTitle>
-          <CardDescription>
-            Describe what you want to predict and let AI analyze your data
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="instructions">Prediction Instructions</Label>
-            <Input
-              id="instructions"
-              placeholder="e.g., Predict sales for next quarter based on historical trends..."
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              disabled={loading}
-            />
-            <p className="text-xs text-slate-500">
-              Describe what you want to predict or analyze
-            </p>
-          </div>
-
-          <Button
-            onClick={handlePredict}
-            disabled={loading}
-            className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <Brain className="w-4 h-4 mr-2" />
-                Generate Predictions
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Prediction Result */}
-      {result && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Prediction Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-slate-50 rounded-lg">
-              {typeof result === 'string' ? (
-                <p className="whitespace-pre-wrap">{result}</p>
-              ) : (
-                <pre className="text-sm overflow-auto">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Empty state for predictions */}
-      {!result && !loading && (
-        <Card>
-          <CardContent className="py-12">
-            <EmptyState
-              icon={<Brain className="w-12 h-12" />}
-              title="No Predictions Yet"
-              description="Generate your first prediction using the AI-powered prediction engine above."
-            />
-          </CardContent>
-        </Card>
-      )}
+    <div className="p-6">
+      <PredictionsView
+        headers={headers}
+        data={data}
+        models={models}
+        isCreating={isCreating}
+        isTraining={isTraining}
+        onCreateClick={handleCreateClick}
+        onTrainModel={handleTrainModel}
+        onDeleteModel={handleDeleteModel}
+        onCancelCreate={handleCancelCreate}
+      />
     </div>
   );
 }

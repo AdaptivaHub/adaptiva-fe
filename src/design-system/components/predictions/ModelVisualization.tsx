@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BarChart, Bar, ScatterChart, Scatter, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Card } from '../ui/card';
 import { TrendingUp, BarChart3, GitBranch } from 'lucide-react';
-import type { TrainedModel } from './PredictionsView';
+import type { TrainedModel } from '@/types';
 
 interface ModelVisualizationProps {
   model: TrainedModel;

@@ -1,9 +1,10 @@
 import { TrendingUp, GitBranch } from 'lucide-react';
 import { cn } from '../ui/utils';
+import type { ModelType } from '@/types';
 
 interface ModelTypeSelectorProps {
-  selectedType: 'linear-regression' | 'decision-tree';
-  onTypeChange: (type: 'linear-regression' | 'decision-tree') => void;
+  selectedType: ModelType;
+  onTypeChange: (type: ModelType) => void;
   className?: string;
 }
 

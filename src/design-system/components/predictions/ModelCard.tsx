@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 import { ModelVisualization } from './ModelVisualization';
-import type { TrainedModel } from './PredictionsView';
+import type { TrainedModel } from '@/types';
 
 interface ModelCardProps {
   model: TrainedModel;

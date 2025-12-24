@@ -1,4 +1,5 @@
 export * from './chartSpec';
+export * from './predictions';
 
 export interface DataRow {
   [key: string]: string | number | null;
@@ -183,40 +184,8 @@ export interface ChartConfig {
   createdAt: Date;
 }
 
-// =============================================================================
-// ML/Prediction Types (for design system)
-// =============================================================================
-
-export interface TrainedModel {
-  id: string;
-  name: string;
-  type: 'linear-regression' | 'decision-tree';
-  targetVariable: string;
-  features: string[];
-  metrics: {
-    r2?: number;
-    mae?: number;
-    rmse?: number;
-    accuracy?: number;
-    crossValScores?: number[];
-  };
-  coefficients?: Record<string, number>;
-  featureImportance?: Record<string, number>;
-  confusionMatrix?: number[][];
-  trainedAt: Date;
-  dataPoints: number;
-  testSize: number;
-}
-
-export interface ModelTrainingConfig {
-  name?: string;
-  type: 'linear-regression' | 'decision-tree';
-  targetVariable: string;
-  features: string[];
-  trainSize: number;
-  maxDepth?: number;
-  useCrossValidation: boolean;
-}
+// Note: ML/Prediction types are now in src/types/predictions.ts
+// They are re-exported via `export * from './predictions'` at the top of this file
 
 // =============================================================================
 // Data Quality Types (for design system)

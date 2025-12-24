@@ -33,7 +33,6 @@ export { PlotlyChartRenderer, createPlotlyJson } from './components/charts/Plotl
 
 // Prediction Components
 export { ModelCreator } from './components/predictions/ModelCreator';
-export type { ModelTrainingRequest, ModelType } from './components/predictions/ModelCreator';
 export { ModelCard } from './components/predictions/ModelCard';
 export { ModelTypeSelector } from './components/predictions/ModelTypeSelector';
 export { FeatureSelector } from './components/predictions/FeatureSelector';

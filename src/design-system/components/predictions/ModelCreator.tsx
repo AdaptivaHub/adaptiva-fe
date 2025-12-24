@@ -9,19 +9,7 @@ import { Switch } from '../ui/switch';
 import { ModelTypeSelector } from './ModelTypeSelector';
 import { FeatureSelector } from './FeatureSelector';
 import { DataValidationWarning } from './DataValidationWarning';
-
-export type ModelType = 'linear-regression' | 'decision-tree';
-
-// Training configuration passed to the app layer
-export interface ModelTrainingRequest {
-  name: string;
-  type: ModelType;
-  targetVariable: string;
-  features: string[];
-  trainSize: number;
-  maxDepth?: number;
-  useCrossValidation: boolean;
-}
+import type { ModelType, ModelTrainingRequest } from '@/types';
 
 interface ModelCreatorProps {
   headers: string[];
@@ -33,7 +21,7 @@ interface ModelCreatorProps {
   onCancel: () => void;
 }
 
-export function ModelCreator({ 
+export function ModelCreator({
   headers, 
   data, 
   onTrainModel, 
