@@ -1,11 +1,15 @@
 /**
  * Charts Page - Chart generation and gallery
+ * 
+ * Uses the unified chart architecture:
+ * - AI suggests ChartSpec via /api/charts/suggest
+ * - ChartSpec is rendered via /api/charts/render
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFileStore } from '@/stores';
-import { useChart, type ChartResult } from '@/hooks/api';
+import { useChart } from '@/hooks/api';
 import { Button } from '@design/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@design/components/ui/card';
 import { Input } from '@design/components/ui/input';
@@ -20,27 +24,42 @@ export function ChartsPage() {
   const metadata = useFileStore((state) => state.metadata);
   const hasFile = metadata !== null;
 
-  const { generateChart, loading, error } = useChart();
+  const { 
+    spec,
+    chartJson,
+    explanation,
+    confidence,
+    loading,
+    suggesting,
+    error,
+    suggest,
+    render,
+  } = useChart();
 
   const [instructions, setInstructions] = useState('');
-  const [chartResult, setChartResult] = useState<ChartResult | null>(null);
+
+  // Auto-render when spec changes
+  useEffect(() => {
+    if (spec) {
+      render(spec);
+    }
+  }, [spec, render]);
 
   const handleGenerateChart = useCallback(async () => {
     if (!metadata?.fileId) return;
 
-    const result = await generateChart(
+    const success = await suggest(
       metadata.fileId,
       instructions || undefined,
       metadata.activeSheet
     );
 
-    if (result) {
-      setChartResult(result);
+    if (success) {
       toast.success('Chart generated successfully!');
     } else if (error) {
       toast.error(error);
     }
-  }, [metadata, instructions, generateChart, error]);
+  }, [metadata, instructions, suggest, error]);
 
   // No file uploaded
   if (!hasFile) {
@@ -64,6 +83,8 @@ export function ChartsPage() {
     );
   }
 
+  const isProcessing = loading || suggesting;
+
   return (
     <div className="p-6 space-y-6">
       {/* Chart Generation Card */}
@@ -85,7 +106,7 @@ export function ChartsPage() {
               placeholder="e.g., Create a bar chart showing sales by region..."
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
-              disabled={loading}
+              disabled={isProcessing}
             />
             <p className="text-xs text-slate-500">
               Leave empty for AI to suggest the best visualization
@@ -94,13 +115,13 @@ export function ChartsPage() {
 
           <Button
             onClick={handleGenerateChart}
-            disabled={loading}
+            disabled={isProcessing}
             className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
           >
-            {loading ? (
+            {isProcessing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating...
+                {suggesting ? 'AI Suggesting...' : 'Rendering...'}
               </>
             ) : (
               <>
@@ -112,21 +133,41 @@ export function ChartsPage() {
         </CardContent>
       </Card>
 
-      {/* Chart Result */}
-      {chartResult && (
+      {/* AI Explanation */}
+      {explanation && (
+        <Card className="border-indigo-200 bg-indigo-50/50">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-indigo-600 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm text-indigo-900">{explanation}</p>
+                {confidence > 0 && (
+                  <p className="text-xs text-indigo-600">
+                    Confidence: {Math.round(confidence * 100)}%
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}      {/* Chart Result */}
+      {chartJson && (
         <Card>
           <CardHeader>
             <CardTitle>Generated Chart</CardTitle>
-            {chartResult.explanation && (
-              <CardDescription>{chartResult.explanation}</CardDescription>
+            {spec && (
+              <CardDescription>
+                {spec.chart_type.charAt(0).toUpperCase() + spec.chart_type.slice(1)} Chart
+                {spec.visual?.title && ` - ${spec.visual.title}`}
+              </CardDescription>
             )}
           </CardHeader>
           <CardContent>
             <div className="w-full" style={{ minHeight: '400px' }}>
               <Plot
-                data={chartResult.chartJson.data as Plotly.Data[]}
+                data={(chartJson.data || []) as Plotly.Data[]}
                 layout={{
-                  ...(chartResult.chartJson.layout as Partial<Plotly.Layout>),
+                  ...((chartJson.layout || {}) as Partial<Plotly.Layout>),
                   autosize: true,
                 }}
                 config={{ responsive: true }}
@@ -138,7 +179,7 @@ export function ChartsPage() {
       )}
 
       {/* Empty state for charts */}
-      {!chartResult && !loading && (
+      {!chartJson && !isProcessing && (
         <Card>
           <CardContent className="py-12">
             <EmptyState

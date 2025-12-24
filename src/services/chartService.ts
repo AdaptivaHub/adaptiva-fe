@@ -1,57 +1,107 @@
 /**
- * Chart Service - Chart generation API calls
+ * Chart Service - Unified Chart Generation API
+ * 
+ * Uses the new unified chart architecture:
+ * - POST /api/charts/suggest - AI generates ChartSpec (rate-limited)
+ * - POST /api/charts/render - Render ChartSpec → Plotly JSON (free)
+ * - POST /api/charts/validate - Pre-flight validation (free)
  */
 
 import { apiClient, handleApiError, type ApiResponse } from './api';
-import type { AIChartResponse, ChartSettings } from '@/types';
+import type { 
+  ChartSpec,
+  ChartRenderResponse, 
+  ChartValidateResponse,
+  AISuggestResponse,
+  RateLimitInfo,
+} from '@/types';
 
-export interface ManualChartResponse {
-  chart_json: Record<string, unknown>;
-  message: string;
+/**
+ * Extract rate limit info from response headers
+ */
+function extractRateLimitInfo(headers: unknown): RateLimitInfo | null {
+  const h = headers as Record<string, string | undefined>;
+  const limit = h['x-ratelimit-limit'];
+  const remaining = h['x-ratelimit-remaining'];
+  const reset = h['x-ratelimit-reset'];
+  const used = h['x-ratelimit-used'];
+  
+  if (limit && remaining && reset && used) {
+    return {
+      limit: parseInt(limit, 10),
+      remaining: parseInt(remaining, 10),
+      reset: parseInt(reset, 10),
+      used: parseInt(used, 10),
+    };
+  }
+  return null;
+}
+
+export interface SuggestResult {
+  response: AISuggestResponse;
+  rateLimit: RateLimitInfo | null;
 }
 
 export const chartService = {
   /**
-   * Generate a chart using AI based on user instructions
+   * Get AI-powered chart suggestion
+   * 
+   * Rate-limited for anonymous users (3/day).
+   * Returns a ChartSpec that can be edited and rendered.
    */
-  async generateAI(
+  async suggest(
     fileId: string,
     userInstructions?: string,
     sheetName?: string
-  ): Promise<ApiResponse<AIChartResponse>> {
+  ): Promise<ApiResponse<SuggestResult>> {
     try {
-      const response = await apiClient.post('/charts/ai', {
+      const response = await apiClient.post('/charts/suggest', {
         file_id: fileId,
         sheet_name: sheetName ?? null,
         user_instructions: userInstructions || null,
       });
-      return { success: true, data: response.data };
+      
+      const rateLimit = extractRateLimitInfo(response.headers);
+      
+      return { 
+        success: true, 
+        data: {
+          response: response.data,
+          rateLimit,
+        }
+      };
     } catch (error) {
-      return handleApiError<AIChartResponse>(error);
+      return handleApiError<SuggestResult>(error);
     }
   },
 
   /**
-   * Generate a chart with manual configuration
+   * Render a ChartSpec to Plotly JSON
+   * 
+   * No rate limiting - free to call.
+   * This is the single render path for all charts.
    */
-  async generateManual(
-    fileId: string,
-    settings: ChartSettings,
-    sheetName?: string
-  ): Promise<ApiResponse<ManualChartResponse>> {
+  async render(spec: ChartSpec): Promise<ApiResponse<ChartRenderResponse>> {
     try {
-      const response = await apiClient.post('/charts/', {
-        file_id: fileId,
-        sheet_name: sheetName ?? null,
-        chart_type: settings.chart_type || 'bar',
-        x_column: settings.x_column,
-        y_column: settings.y_column,
-        title: settings.title || 'Chart',
-        color_column: settings.color_column,
-      });
+      const response = await apiClient.post('/charts/render', { spec });
       return { success: true, data: response.data };
     } catch (error) {
-      return handleApiError<ManualChartResponse>(error);
+      return handleApiError<ChartRenderResponse>(error);
+    }
+  },
+
+  /**
+   * Validate a ChartSpec before rendering
+   * 
+   * No rate limiting - free to call.
+   * Returns errors and warnings.
+   */
+  async validate(spec: ChartSpec): Promise<ApiResponse<ChartValidateResponse>> {
+    try {
+      const response = await apiClient.post('/charts/validate', { spec });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError<ChartValidateResponse>(error);
     }
   },
 };

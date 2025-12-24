@@ -6,11 +6,75 @@
   margin-bottom: 1rem;
 }
 
+.chart-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 .chart-editor-title {
-  margin: 0 0 1rem 0;
+  margin: 0;
   font-size: 1rem;
   font-weight: 600;
   color: #495057;
+}
+
+.ai-suggest-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+}
+
+.ai-suggest-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+}
+
+.ai-suggest-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ai-explanation-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
+  border: 1px solid #c4b5fd;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.ai-explanation-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.ai-explanation-content {
+  flex: 1;
+}
+
+.ai-explanation-content p {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  color: #5b21b6;
+  line-height: 1.4;
+}
+
+.ai-confidence {
+  font-size: 0.75rem;
+  color: #7c3aed;
+  font-weight: 500;
 }
 
 .chart-editor-grid {
@@ -24,6 +88,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+}
+
+.chart-editor-field-full {
+  grid-column: 1 / -1;
 }
 
 .chart-editor-field label {
@@ -69,7 +137,7 @@
   border-top: 1px solid #e9ecef;
 }
 
-.update-chart-btn {
+.render-chart-btn {
   padding: 0.5rem 1.25rem;
   background-color: #228be6;
   color: white;
@@ -81,11 +149,11 @@
   transition: background-color 0.15s ease-in-out;
 }
 
-.update-chart-btn:hover:not(:disabled) {
+.render-chart-btn:hover:not(:disabled) {
   background-color: #1c7ed6;
 }
 
-.update-chart-btn:disabled {
+.render-chart-btn:disabled {
   background-color: #adb5bd;
   cursor: not-allowed;
 }

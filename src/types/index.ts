@@ -1,3 +1,5 @@
+export * from './chartSpec';
+
 export interface DataRow {
   [key: string]: string | number | null;
 }

@@ -10,31 +10,42 @@ import { RateLimitBanner } from './components/RateLimitBanner';
 import { useAuth } from './context/AuthContext';
 import { useCleanData } from './hooks/useCleanData';
 import { useInsights } from './hooks/useInsights';
-import { useChart, type ChartResult } from './hooks/useChart';
+import { useChart } from './hooks/useChart';
 import { usePredict } from './hooks/usePredict';
 import { useExport } from './hooks/useExport';
 import { api } from './utils/api';
-import type { UploadedData, ChartSettings } from './types';
+import type { UploadedData } from './types';
 import './App.css';
 
 function App() {
   const [uploadedData, setUploadedData] = useState<UploadedData | null>(null);
   const [instructions, setInstructions] = useState('');
-  const [chartResult, setChartResult] = useState<ChartResult | null>(null);
   const [insights, setInsights] = useState<string | Record<string, unknown> | null>(null);
   const [predictions, setPredictions] = useState<string | Record<string, unknown> | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
-  const [rateLimitInfo, setRateLimitInfo] = useState({ queriesUsed: 0, queriesLimit: 3 });
 
   const { isAuthenticated } = useAuth();
   const { cleanData, loading: cleanLoading, error: cleanError, result: cleaningResult } = useCleanData();
   const { getInsights, loading: insightsLoading, error: insightsError } = useInsights();
-  const { generateChart, generateManualChart, loading: chartLoading, error: chartError } = useChart();
+  const { 
+    spec,
+    chartJson,
+    explanation,
+    confidence,
+    rateLimit,
+    loading: chartLoading,
+    suggesting: chartSuggesting,
+    error: chartError,
+    suggest,
+    render,
+    setSpec,
+    reset: resetChart,
+  } = useChart();
   const { predict, loading: predictLoading, error: predictError } = usePredict();
   const { exportData, loading: exportLoading, error: exportError } = useExport();
 
-  const isLoading = cleanLoading || insightsLoading || chartLoading || predictLoading || exportLoading;
+  const isLoading = cleanLoading || insightsLoading || chartLoading || chartSuggesting || predictLoading || exportLoading;
 
   const openAuthModal = (mode: 'login' | 'register' = 'login') => {
     setAuthModalMode(mode);
@@ -43,7 +54,7 @@ function App() {
 
   const handleDataLoaded = (data: UploadedData) => {
     setUploadedData(data);
-    setChartResult(null);
+    resetChart();
     setInsights(null);
     setPredictions(null);
   };
@@ -63,7 +74,7 @@ function App() {
           headers: previewResult.data.headers,
         });
 
-        setChartResult(null);
+        resetChart();
         setInsights(null);
         setPredictions(null);
       }
@@ -112,26 +123,37 @@ function App() {
     }
   };
 
-  const handleGenerateChart = async () => {
-    if (!uploadedData || !uploadedData.fileId) {
-      return;
-    }
-
-    const result = await generateChart(
+  // AI-powered chart suggestion
+  const handleAISuggest = async () => {
+    if (!uploadedData?.fileId) return;
+    
+    const success = await suggest(
       uploadedData.fileId,
-      instructions,
+      instructions || undefined,
       uploadedData.activeSheet
     );
-    if (result) {
-      setChartResult(result);
+    
+    // If AI suggestion succeeded and we have a spec, auto-render it
+    if (success) {
+      // The suggest call updates spec in hook state, so we need to get it
+      // and render it after the state updates
+      // We'll trigger render in a useEffect or just call it after
     }
+  };
+  
+  // Render the current chart spec
+  const handleRenderChart = async () => {
+    if (!spec) return;
+    await render(spec);
+  };
 
-    if (!isAuthenticated) {
-      setRateLimitInfo((prev) => ({
-        ...prev,
-        queriesUsed: Math.min(prev.queriesUsed + 1, prev.queriesLimit),
-      }));
-    }
+  // Called when user clicks "Generate Chart" from Controls
+  // This triggers AI suggestion if there's no spec, otherwise renders existing spec
+  const handleGenerateChart = async () => {
+    if (!uploadedData?.fileId) return;
+    
+    // Use AI to suggest a chart based on the data and instructions
+    await handleAISuggest();
   };
 
   const handlePredict = async () => {
@@ -142,25 +164,10 @@ function App() {
       setPredictions(result);
     }
   };
-
   const handleExport = async () => {
     if (!uploadedData) return;
 
     await exportData(uploadedData.data, 'csv');
-  };
-
-  const handleUpdateChartSettings = async (settings: ChartSettings) => {
-    if (!uploadedData?.fileId) return;
-
-    const result = await generateManualChart(
-      uploadedData.fileId,
-      settings,
-      uploadedData.activeSheet
-    );
-
-    if (result) {
-      setChartResult(result);
-    }
   };
 
   return (
@@ -178,10 +185,10 @@ function App() {
       </header>
 
       <main className="app-main">
-        {!isAuthenticated && rateLimitInfo.queriesUsed > 0 && (
+        {!isAuthenticated && rateLimit && rateLimit.used > 0 && (
           <RateLimitBanner
-            queriesUsed={rateLimitInfo.queriesUsed}
-            queriesLimit={rateLimitInfo.queriesLimit}
+            queriesUsed={rateLimit.used}
+            queriesLimit={rateLimit.limit}
             onSignUpClick={() => openAuthModal('register')}
           />
         )}
@@ -273,15 +280,22 @@ function App() {
                 type="success"
               />
             )}
-            {chartResult && (
+            
+            {/* Chart section - show when we have a spec or chart data */}
+            {uploadedData.fileId && (spec || chartJson) && (
               <ChartView
-                chartData={chartResult.chartJson}
-                explanation={chartResult.explanation}
-                generatedCode={chartResult.generatedCode}
-                chartSettings={chartResult.chartSettings}
-                columns={uploadedData?.headers || []}
-                onUpdateChart={handleUpdateChartSettings}
-                isUpdating={chartLoading}
+                chartData={chartJson}
+                spec={spec}
+                columns={uploadedData.headers || []}
+                fileId={uploadedData.fileId}
+                sheetName={uploadedData.activeSheet}
+                onSpecChange={setSpec}
+                onRenderChart={handleRenderChart}
+                onAISuggest={handleAISuggest}
+                isRendering={chartLoading}
+                isSuggesting={chartSuggesting}
+                explanation={explanation}
+                confidence={confidence}
               />
             )}
           </>
