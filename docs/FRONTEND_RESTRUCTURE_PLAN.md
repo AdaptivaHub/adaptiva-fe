@@ -331,7 +331,7 @@ Update `tsconfig.app.json`:
   "paths": {
     "@/*": ["./src/*"],
     "@design/*": ["./src/design-system/*"],
-    "@components/*": ["./src/components/*"],
+    "@features/*": ["./src/features/*"],
     "@hooks/*": ["./src/hooks/*"],
     "@services/*": ["./src/services/*"],
     "@stores/*": ["./src/stores/*"],

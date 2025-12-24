@@ -63,7 +63,7 @@ Configured in `tsconfig.app.json` and `vite.config.ts`:
 | Alias | Path |
 |-------|------|
 | `@/*` | `src/*` |
-| `@components/*` | `src/components/*` |
+| `@features/*` | `src/features/*` |
 | `@hooks/*` | `src/hooks/*` |
 | `@services/*` | `src/services/*` |
 | `@stores/*` | `src/stores/*` |
