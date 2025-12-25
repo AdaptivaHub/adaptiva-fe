@@ -26,7 +26,7 @@ export function DashboardPage() {
           description="Upload your CSV or Excel file to start analyzing and visualizing your data with AI."
           action={            <Button
               onClick={() => navigate('/upload')}
-              className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
+              className="bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600"
             >
               <Upload className="w-4 h-4 mr-2" />
               Upload File

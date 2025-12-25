@@ -434,7 +434,7 @@ export function DataPreview({
                       onClick={() => setCurrentPage(pageNum)}
                       className={cn(
                         currentPage === pageNum &&
-                          'bg-gradient-to-r from-brand-500 to-brand-600'
+                          'bg-gradient-to-r from-brand-600 to-brand-500'
                       )}
                     >
                       {pageNum}

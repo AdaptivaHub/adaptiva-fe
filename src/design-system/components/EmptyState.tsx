@@ -89,7 +89,7 @@ export function EmptyState({
   // Render default home page empty state
   return (
     <div className="text-center max-w-4xl mx-auto">
-      <div className="mb-8">        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 mb-6 shadow-lg shadow-brand-500/50">
+      <div className="mb-8">        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-500 mb-6 shadow-lg shadow-brand-500/50">
           <BrandLogo className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-slate-900 mb-4">
@@ -103,7 +103,7 @@ export function EmptyState({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <Button 
             size="lg"
-            className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white shadow-lg"
+            className="bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 text-white shadow-lg"
             onClick={onUploadClick}
           >
             <Upload className="w-5 h-5 mr-2" />

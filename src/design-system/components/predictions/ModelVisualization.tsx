@@ -259,7 +259,7 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
                     <div key={i} className="flex items-center gap-3">
                       <span className="text-xs font-medium text-slate-600 w-12">Fold {i + 1}</span>
                       <div className="flex-1 bg-slate-100 rounded-full h-6 relative overflow-hidden">                        <div 
-                          className="bg-gradient-to-r from-brand-500 to-brand-600 h-full rounded-full flex items-center justify-end pr-2"
+                          className="bg-gradient-to-r from-brand-600 to-brand-500 h-full rounded-full flex items-center justify-end pr-2"
                           style={{ width: `${score * 100}%` }}
                         >
                           <span className="text-xs font-medium text-white">

@@ -141,7 +141,7 @@ export function ChartCreator({
               />              <Button 
                 onClick={handleAIGenerate}
                 disabled={!aiPrompt.trim() || isGenerating}
-                className="bg-gradient-to-r from-brand-500 to-brand-600"
+                className="bg-gradient-to-r from-brand-600 to-brand-500"
               >
                 {isGenerating ? (
                   <div className="flex items-center gap-2">

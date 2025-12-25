@@ -129,7 +129,7 @@ export function ChartGallery({
             </>
           )}          <Button
             onClick={onCreateClick}
-            className="bg-gradient-to-r from-brand-500 to-brand-600"
+            className="bg-gradient-to-r from-brand-600 to-brand-500"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Chart
@@ -153,7 +153,7 @@ export function ChartGallery({
               </p>
               <Button
                 onClick={onCreateClick}
-                className="bg-gradient-to-r from-brand-500 to-brand-600"
+                className="bg-gradient-to-r from-brand-600 to-brand-500"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Chart

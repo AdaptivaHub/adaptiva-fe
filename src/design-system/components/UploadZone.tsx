@@ -133,7 +133,7 @@ export function UploadZone({
               />
               <label 
                 htmlFor="file-upload" 
-                className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 transition-colors"
+                className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 transition-colors"
               >
                 <Upload className="w-4 h-4" />
                 Choose File

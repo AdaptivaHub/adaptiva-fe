@@ -50,7 +50,7 @@ export function DataQualityBanner({
   description,
   icon,
   actionLabel = 'Clean Data Now',
-  benefitText = '✨ Improve AI accuracy by up to 40%',
+  benefitText = 'Improve AI accuracy by up to 40%',
   benefitDescription = 'Our AI-powered cleaning handles missing values, removes duplicates, and standardizes formats automatically',
   onAction,
   onDismiss,
@@ -83,7 +83,7 @@ export function DataQualityBanner({
       <div className="relative">
         <div className="flex items-start gap-4">          {/* Icon */}
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-600 to-brand-500 flex items-center justify-center shadow-lg">
               {icon ?? <BrandLogo className="w-6 h-6 text-white" />}
             </div>
           </div>
@@ -153,7 +153,7 @@ export function DataQualityBanner({
                 </p>
               </div>              <Button
                 onClick={handleAction}
-                className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-md whitespace-nowrap"
+                className="bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 shadow-md whitespace-nowrap"
               >
                 {actionLabel}
                 <ArrowRight className="w-4 h-4 ml-2" />

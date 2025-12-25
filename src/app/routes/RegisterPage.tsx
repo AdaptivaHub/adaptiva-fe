@@ -120,7 +120,7 @@ export function RegisterPage() {
 
         <Button
           type="submit"
-          className="w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
+          className="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600"
           disabled={isLoading}
         >
           {isLoading ? 'Creating account...' : 'Create account'}

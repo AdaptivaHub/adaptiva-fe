@@ -305,7 +305,7 @@ export function ModelCreator({
           <Button
             onClick={handleTrain}
             disabled={hasErrors || isTraining}
-            className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
+            className="flex-1 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600"
           >
             {isTraining ? (
               <>

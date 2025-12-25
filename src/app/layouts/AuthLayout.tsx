@@ -18,7 +18,7 @@ export function AuthLayout() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-600 to-brand-500 flex items-center justify-center">
             <BrandLogo className="w-6 h-6 text-white" />
           </div>
           <span className="font-bold text-2xl bg-gradient-to-r from-brand-600 to-brand-500 bg-clip-text text-transparent">
