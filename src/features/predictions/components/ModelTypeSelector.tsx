@@ -1,5 +1,5 @@
 import { TrendingUp, GitBranch } from 'lucide-react';
-import { cn } from '../ui/utils';
+import { cn } from '@design/components/ui/utils';
 import type { ModelType } from '@/types';
 
 interface ModelTypeSelectorProps {

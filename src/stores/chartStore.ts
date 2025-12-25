@@ -4,10 +4,10 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ChartConfig } from '@design/components/charts/ChartCreator';
+import type { ChartConfig } from '@features/charts';
 
 // Re-export for convenience
-export type { ChartConfig } from '@design/components/charts/ChartCreator';
+export type { ChartConfig } from '@features/charts';
 
 interface ChartState {
   charts: ChartConfig[];

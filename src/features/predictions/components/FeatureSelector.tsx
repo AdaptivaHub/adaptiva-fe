@@ -1,6 +1,6 @@
 import { Hash, Type, Check } from 'lucide-react';
-import { cn } from '../ui/utils';
-import { Badge } from '../ui/badge';
+import { cn } from '@design/components/ui/utils';
+import { Badge } from '@design/components/ui/badge';
 
 interface FeatureSelectorProps {
   features: string[];

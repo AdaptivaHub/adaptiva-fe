@@ -10,7 +10,7 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 import { ChartEditor } from './ChartEditor';
-import type { ChartSpec } from '../types';
+import type { ChartSpec } from '@/types';
 import './ChartView.css';
 
 interface ChartViewProps {

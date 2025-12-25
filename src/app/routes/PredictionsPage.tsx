@@ -7,7 +7,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFileStore, usePredictionStore } from '@/stores';
 import { useTrainModel } from '@/hooks/api';
-import { PredictionsView } from '@design/components/predictions';
+import { PredictionsView } from '@features/predictions';
 import { Button } from '@design/components/ui/button';
 import { EmptyState } from '@design/components/EmptyState';
 import { Upload } from 'lucide-react';

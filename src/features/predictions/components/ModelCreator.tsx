@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { TrendingUp, GitBranch, ArrowRight, X } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Slider } from '../ui/slider';
-import { Switch } from '../ui/switch';
+import { Card } from '@design/components/ui/card';
+import { Button } from '@design/components/ui/button';
+import { Label } from '@design/components/ui/label';
+import { Input } from '@design/components/ui/input';
+import { Slider } from '@design/components/ui/slider';
+import { Switch } from '@design/components/ui/switch';
 import { ModelTypeSelector } from './ModelTypeSelector';
 import { FeatureSelector } from './FeatureSelector';
 import { DataValidationWarning } from './DataValidationWarning';

@@ -1,6 +1,6 @@
 import { Lightbulb, TrendingUp, PieChart, BarChart3 } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Card } from '@design/components/ui/card';
+import { Badge } from '@design/components/ui/badge';
 import type { ChartType } from './ChartTypeSelector';
 
 interface ChartSuggestionsProps {

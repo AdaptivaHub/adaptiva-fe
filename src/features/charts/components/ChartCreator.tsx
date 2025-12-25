@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Plus, Wand2 } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { BrandLogo } from '../BrandLogo';
+import { Card } from '@design/components/ui/card';
+import { Button } from '@design/components/ui/button';
+import { Input } from '@design/components/ui/input';
+import { Label } from '@design/components/ui/label';
+import { BrandLogo } from '@design/components/BrandLogo';
 import { ChartTypeSelector, type ChartType } from './ChartTypeSelector';
 import { ChartPreview } from './ChartPreview';
 import { ChartSuggestions } from './ChartSuggestions';
@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
+} from '@design/components/ui/select';
 
 // Re-export types for convenience
 export type { ChartType } from './ChartTypeSelector';

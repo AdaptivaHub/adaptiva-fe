@@ -10,8 +10,8 @@ import type {
   ChartType, 
   AggregationMethod,
   ColorPalette,
-} from '../types';
-import { createDefaultChartSpec } from '../types/chartSpec';
+} from '@/types';
+import { createDefaultChartSpec } from '@/types/chartSpec';
 import './ChartEditor.css';
 
 interface ChartEditorProps {

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { TrendingUp, GitBranch, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
+import { Card } from '@design/components/ui/card';
+import { Button } from '@design/components/ui/button';
+import { Badge } from '@design/components/ui/badge';
+import { Progress } from '@design/components/ui/progress';
 import { ModelVisualization } from './ModelVisualization';
 import type { TrainedModel } from '@/types';
 

@@ -1,8 +1,8 @@
 import { Plus, Download, Grid3x3, LayoutGrid } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '@design/components/ui/button';
 import { ChartCard } from './ChartCard';
 import { ChartCreator, type ChartConfig, type ChartCreationConfig } from './ChartCreator';
-import { Card } from '../ui/card';
+import { Card } from '@design/components/ui/card';
 
 interface ChartGalleryProps {
   headers: string[];

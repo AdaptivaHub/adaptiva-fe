@@ -21,26 +21,35 @@ export { BrandLogo } from './components/BrandLogo';
 export { UploadZone } from './components/UploadZone';
 export type { UploadZoneProps, SampleDataset } from './components/UploadZone';
 
-// Chart Components
-export { ChartCard } from './components/charts/ChartCard';
-export { ChartCreator } from './components/charts/ChartCreator';
-export type { ChartConfig, ChartCreationConfig, PlotlyJson } from './components/charts/ChartCreator';
-export { ChartGallery } from './components/charts/ChartGallery';
-export { ChartPreview } from './components/charts/ChartPreview';
-export { ChartSuggestions } from './components/charts/ChartSuggestions';
-export { ChartTypeSelector } from './components/charts/ChartTypeSelector';
-export type { ChartType } from './components/charts/ChartTypeSelector';
-export { PlotlyChartRenderer, createPlotlyJson } from './components/charts/PlotlyChartRenderer';
+// Chart Components - Re-exported from features/charts
+export { 
+  ChartCard,
+  ChartCreator,
+  ChartGallery,
+  ChartPreview,
+  ChartSuggestions,
+  ChartTypeSelector,
+  PlotlyChartRenderer,
+  createPlotlyJson,
+} from '@features/charts';
+export type { 
+  ChartConfig, 
+  ChartCreationConfig, 
+  PlotlyJson,
+  ChartType,
+} from '@features/charts';
 
-// Prediction Components
-export { ModelCreator } from './components/predictions/ModelCreator';
-export { ModelCard } from './components/predictions/ModelCard';
-export { ModelTypeSelector } from './components/predictions/ModelTypeSelector';
-export { FeatureSelector } from './components/predictions/FeatureSelector';
-export { DataValidationWarning } from './components/predictions/DataValidationWarning';
-export { EmptyPredictionsState } from './components/predictions/EmptyPredictionsState';
-export { ModelVisualization } from './components/predictions/ModelVisualization';
-export { PredictionsView } from './components/predictions/PredictionsView';
+// Prediction Components - Re-exported from features/predictions
+export { 
+  ModelCreator,
+  ModelCard,
+  ModelTypeSelector,
+  FeatureSelector,
+  DataValidationWarning,
+  EmptyPredictionsState,
+  ModelVisualization,
+  PredictionsView,
+} from '@features/predictions';
 
 // Utils (export functions, not types again)
 export { analyzeDataQuality } from './utils/dataQuality';

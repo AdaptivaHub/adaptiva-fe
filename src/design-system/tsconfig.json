@@ -4,13 +4,12 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Path aliases - baseUrl is relative to this file's location */
+    "skipLibCheck": true,    /* Path aliases - baseUrl is relative to this file's location */
     "baseUrl": "../..",
     "paths": {
       "@/*": ["./src/*"],
-      "@design/*": ["./src/design-system/*"]
+      "@design/*": ["./src/design-system/*"],
+      "@features/*": ["./src/features/*"]
     },
 
     /* Bundler mode */

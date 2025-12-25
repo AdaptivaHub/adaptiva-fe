@@ -4,9 +4,8 @@
 // Re-export data quality types from the canonical source
 export type { DataQualityIssue, ColumnIssue, DataQualityReport } from './utils/dataQuality';
 
-// Re-export chart types from the canonical sources
-export type { ChartConfig, PlotlyJson } from './components/charts/ChartCreator';
-export type { ChartType } from './components/charts/ChartTypeSelector';
+// Re-export chart types from the features/charts module
+export type { ChartConfig, PlotlyJson, ChartType } from '@features/charts';
 
 /**
  * Column type classification (from backend)

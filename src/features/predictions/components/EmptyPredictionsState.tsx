@@ -1,7 +1,7 @@
 import { Brain, TrendingUp, GitBranch } from 'lucide-react';
-import { BrandLogo } from '../BrandLogo';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
+import { BrandLogo } from '@design/components/BrandLogo';
+import { Card } from '@design/components/ui/card';
+import { Button } from '@design/components/ui/button';
 
 interface EmptyPredictionsStateProps {
   onCreateModel: () => void;

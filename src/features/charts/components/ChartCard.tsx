@@ -1,13 +1,13 @@
 import { Edit, Trash2, Maximize2, Copy, MoreVertical, Download } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import { Card } from '@design/components/ui/card';
+import { Button } from '@design/components/ui/button';
+import { Badge } from '@design/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '@design/components/ui/dropdown-menu';
 import { ChartPreview } from './ChartPreview';
 import type { ChartConfig } from './ChartCreator';
 import type { ChartType } from './ChartTypeSelector';

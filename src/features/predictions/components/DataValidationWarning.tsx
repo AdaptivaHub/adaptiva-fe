@@ -1,5 +1,5 @@
 import { AlertTriangle, AlertCircle } from 'lucide-react';
-import { Card } from '../ui/card';
+import { Card } from '@design/components/ui/card';
 
 interface ValidationIssue {
   type: 'error' | 'warning';

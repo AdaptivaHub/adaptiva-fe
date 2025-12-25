@@ -1,6 +1,6 @@
 import { Brain, Plus, TrendingUp, GitBranch } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
+import { Card } from '@design/components/ui/card';
+import { Button } from '@design/components/ui/button';
 import { ModelCreator } from './ModelCreator';
 import { ModelCard } from './ModelCard';
 import { EmptyPredictionsState } from './EmptyPredictionsState';

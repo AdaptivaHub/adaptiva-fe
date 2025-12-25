@@ -1,5 +1,5 @@
 import { BarChart3, LineChart, PieChart, ScatterChart, AreaChart, BarChart2, BoxSelect, Grid3x3 } from 'lucide-react';
-import { cn } from '../ui/utils';
+import { cn } from '@design/components/ui/utils';
 
 /** Chart types supported by the system - aligned with ChartSpec */
 export type ChartType = 'bar' | 'line' | 'pie' | 'scatter' | 'area' | 'histogram' | 'box' | 'heatmap';
