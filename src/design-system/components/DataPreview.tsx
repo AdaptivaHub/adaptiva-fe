@@ -41,7 +41,7 @@ import {
   TooltipTrigger,
 } from './ui/tooltip';
 import { cn } from './ui/utils';
-import type { UploadedFile, DataQualityReport } from '../types';
+import type { UploadedFile, DataQualityReport, ColumnInfo, ColumnType } from '../types';
 
 interface DataPreviewProps {
   file: UploadedFile;
@@ -49,6 +49,8 @@ interface DataPreviewProps {
   data?: Record<string, unknown>[];
   /** Column headers - can be passed separately or included in file */
   headers?: string[];
+  /** Column info with types and statistics (from API) */
+  columnInfo?: ColumnInfo[];
   onSheetChange?: (sheetName: string) => void;
   onNewUpload?: () => void;
   qualityReport?: DataQualityReport | null;
@@ -56,18 +58,11 @@ interface DataPreviewProps {
 
 type SortDirection = 'asc' | 'desc' | null;
 
-interface ColumnStats {
-  type: 'number' | 'text' | 'date' | 'unknown';
-  nullCount: number;
-  uniqueCount: number;
-  min?: number;
-  max?: number;
-}
-
 export function DataPreview({ 
   file, 
   data: dataProp, 
   headers: headersProp,
+  columnInfo,
   onSheetChange, 
   onNewUpload,
 }: DataPreviewProps) {
@@ -81,48 +76,16 @@ export function DataPreview({
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
-  // Calculate column statistics
-  const columnStats = useMemo(() => {
-    const stats: Record<string, ColumnStats> = {};
-
-    headers.forEach((header) => {
-      const values = data.map((row) => row[header]);
-      const nonNullValues = values.filter((v) => v != null && v !== '');
-
-      // Detect column type
-      let type: ColumnStats['type'] = 'unknown';
-      if (nonNullValues.length > 0) {
-        const firstValue = nonNullValues[0];
-        if (typeof firstValue === 'number') {
-          type = 'number';
-        } else if (typeof firstValue === 'string') {
-          // Check if it looks like a date
-          if (!isNaN(Date.parse(firstValue as string))) {
-            type = 'date';
-          } else {
-            type = 'text';
-          }
-        }
-      }
-
-      const stat: ColumnStats = {
-        type,
-        nullCount: values.length - nonNullValues.length,
-        uniqueCount: new Set(nonNullValues).size,
-      };
-
-      // Calculate min/max for numbers
-      if (type === 'number') {
-        const numbers = nonNullValues.filter((v) => typeof v === 'number') as number[];
-        if (numbers.length > 0) {
-          stat.min = Math.min(...numbers);
-          stat.max = Math.max(...numbers);
-        }
-      }      stats[header] = stat;
-    });
-
-    return stats;
-  }, [headers, data]);
+  // Build a lookup map for column info by name
+  const columnInfoMap = useMemo(() => {
+    const map: Record<string, ColumnInfo> = {};
+    if (columnInfo) {
+      columnInfo.forEach((info) => {
+        map[info.name] = info;
+      });
+    }
+    return map;
+  }, [columnInfo]);
 
   // Filter and sort data
   const processedData = useMemo(() => {
@@ -172,15 +135,18 @@ export function DataPreview({
       setSortDirection('asc');
     }
   };
-
-  const getColumnIcon = (type: ColumnStats['type']) => {
+  const getColumnIcon = (type: ColumnType | undefined) => {
     switch (type) {
-      case 'number':
+      case 'integer':
+      case 'float':
         return Hash;
       case 'date':
+      case 'datetime':
         return Calendar;
       case 'text':
         return Type;
+      case 'boolean':
+        return Database;
       default:
         return Database;
     }
@@ -304,16 +270,15 @@ export function DataPreview({
               </SelectContent>
             </Select>
           </div>
-        </div>
-      </Card>      {/* Data Table */}
+        </div>      </Card>      {/* Data Table */}
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
                 {headers.map((header) => {
-                  const stats = columnStats[header];
-                  const Icon = getColumnIcon(stats?.type);
+                  const info = columnInfoMap[header];
+                  const Icon = getColumnIcon(info?.type);
                   return (
                     <TableHead key={header} className="font-semibold">                      <TooltipProvider>
                         <Tooltip>
@@ -338,26 +303,27 @@ export function DataPreview({
                           <TooltipContent side="top" className="max-w-xs">
                             <div className="space-y-1">
                               <p className="font-semibold">{header}</p>
-                              <div className="text-xs space-y-0.5">
-                                <p>
-                                  Type:{' '}
-                                  <Badge variant="secondary" className="ml-1">
-                                    {stats?.type}
-                                  </Badge>
-                                </p>
-                                <p>Unique values: {stats?.uniqueCount}</p>
-                                {stats?.nullCount > 0 && (
-                                  <p className="text-yellow-600">
-                                    Null values: {stats.nullCount}
-                                  </p>
-                                )}
-                                {stats?.type === 'number' && (
+                              {info && (
+                                <div className="text-xs space-y-0.5">
                                   <p>
-                                    Range: {stats.min?.toLocaleString()} -{' '}
-                                    {stats.max?.toLocaleString()}
+                                    Type:{' '}
+                                    <Badge variant="secondary" className="ml-1">
+                                      {info.type}
+                                    </Badge>
                                   </p>
-                                )}
-                              </div>
+                                  <p>Unique values: {info.unique_count}</p>
+                                  {info.null_count > 0 && (
+                                    <p className="text-yellow-600">
+                                      Null values: {info.null_count}
+                                    </p>
+                                  )}
+                                  {info.sample_values.length > 0 && (
+                                    <p>
+                                      Samples: {info.sample_values.slice(0, 3).join(', ')}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </TooltipContent>
                         </Tooltip>

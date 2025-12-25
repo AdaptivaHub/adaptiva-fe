@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 
 export interface DataQualityIssue {
-  type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+  type: 'missing' | 'duplicates' | 'formatting';
   count: number;
   severity: 'high' | 'medium' | 'low';
 }
@@ -13,7 +13,7 @@ export interface DataQualityIssue {
 export interface ColumnIssue {
   column: string;
   issues: {
-    type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+    type: 'missing' | 'duplicates' | 'formatting';
     count: number;
     percentage: number;
   }[];

@@ -64,9 +64,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
       const previewResponse = await uploadService.getPreview(file_id, maxRows);
       if (!previewResponse.success || !previewResponse.data) {
         throw new Error(previewResponse.error || 'Failed to process file');
-      }
-
-      const { headers, data, available_sheets, sheet_name } = previewResponse.data;
+      }      const { headers, data, available_sheets, sheet_name, column_info } = previewResponse.data;
 
       // Convert to DataRow format
       const formattedData = data.map(row =>
@@ -84,7 +82,8 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
           columnCount: columns,
         },
         formattedData,
-        headers
+        headers,
+        column_info ?? []
       );
 
       onSuccess?.();

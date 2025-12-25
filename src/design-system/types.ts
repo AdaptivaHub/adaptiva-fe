@@ -9,6 +9,22 @@ export type { ChartConfig, PlotlyJson } from './components/charts/ChartCreator';
 export type { ChartType } from './components/charts/ChartTypeSelector';
 
 /**
+ * Column type classification (from backend)
+ */
+export type ColumnType = 'text' | 'integer' | 'float' | 'date' | 'datetime' | 'boolean' | 'empty';
+
+/**
+ * Column information with detected type and statistics
+ */
+export interface ColumnInfo {
+  name: string;
+  type: ColumnType;
+  sample_values: string[];
+  null_count: number;
+  unique_count: number;
+}
+
+/**
  * File info for layout/navigation components (minimal)
  */
 export interface UploadedFile {

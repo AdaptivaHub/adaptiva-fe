@@ -60,6 +60,18 @@ export interface PreviewResponse {
   message: string;
   sheet_name: string | null; // Current sheet being previewed (Excel only)
   available_sheets: string[] | null; // All available sheets (Excel only)
+  column_info: ColumnInfo[] | null; // Column type information
+}
+
+// Column type classification
+export type ColumnType = 'text' | 'integer' | 'float' | 'date' | 'datetime' | 'boolean' | 'empty';
+
+export interface ColumnInfo {
+  name: string;
+  type: ColumnType;
+  sample_values: string[];
+  null_count: number;
+  unique_count: number;
 }
 
 // Enhanced Data Cleaning Types
@@ -192,7 +204,7 @@ export interface ChartConfig {
 // =============================================================================
 
 export interface DataQualityIssue {
-  type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+  type: 'missing' | 'duplicates' | 'formatting';
   count: number;
   severity: 'high' | 'medium' | 'low';
 }
@@ -200,7 +212,7 @@ export interface DataQualityIssue {
 export interface ColumnIssue {
   column: string;
   issues: {
-    type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+    type: 'missing' | 'duplicates' | 'formatting';
     count: number;
     percentage: number;
   }[];

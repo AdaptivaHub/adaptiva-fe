@@ -1,5 +1,5 @@
 export interface DataQualityIssue {
-  type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+  type: 'missing' | 'duplicates' | 'formatting';
   count: number;
   severity: 'high' | 'medium' | 'low';
 }
@@ -7,7 +7,7 @@ export interface DataQualityIssue {
 export interface ColumnIssue {
   column: string;
   issues: {
-    type: 'missing' | 'duplicates' | 'formatting' | 'outliers';
+    type: 'missing' | 'duplicates' | 'formatting';
     count: number;
     percentage: number;
   }[];
@@ -29,12 +29,10 @@ export function analyzeDataQuality(
   let cleanRows = 0;
   const issues: DataQualityIssue[] = [];
   const columnIssues: ColumnIssue[] = [];
-
   // Track issues by type
   let totalMissing = 0;
   let totalDuplicates = 0;
   let totalFormatting = 0;
-  let totalOutliers = 0;
 
   // Analyze each column
   headers.forEach((header) => {
@@ -77,38 +75,7 @@ export function analyzeDataQuality(
         count: 1,
         percentage: 100,
       });
-    }
-
-    // Check for outliers (for numeric columns)
-    if (typeof columnData[0] === 'number') {
-      const numericValues = columnData.filter(
-        (v) => typeof v === 'number'
-      ) as number[];
-
-      if (numericValues.length > 0) {
-        const mean =
-          numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
-        const variance =
-          numericValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-          numericValues.length;
-        const stdDev = Math.sqrt(variance);
-
-        const outliers = numericValues.filter(
-          (val) => Math.abs(val - mean) > 3 * stdDev
-        );
-
-        if (outliers.length > 0) {
-          totalOutliers += outliers.length;
-          columnIssuesList.push({
-            type: 'outliers',
-            count: outliers.length,
-            percentage: (outliers.length / numericValues.length) * 100,
-          });
-        }
-      }
-    }
-
-    if (columnIssuesList.length > 0) {
+    }    if (columnIssuesList.length > 0) {
       columnIssues.push({
         column: header,
         issues: columnIssuesList,
@@ -140,20 +107,11 @@ export function analyzeDataQuality(
       severity: totalDuplicates > totalRows * 0.05 ? 'high' : 'low',
     });
   }
-
   if (totalFormatting > 0) {
     issues.push({
       type: 'formatting',
       count: totalFormatting,
       severity: totalFormatting > 2 ? 'high' : 'medium',
-    });
-  }
-
-  if (totalOutliers > 0) {
-    issues.push({
-      type: 'outliers',
-      count: totalOutliers,
-      severity: 'low',
     });
   }
 
@@ -167,14 +125,9 @@ export function analyzeDataQuality(
   // Deduct for formatting issues
   const formattingPenalty = (totalFormatting / headers.length) * 30;
   qualityScore -= formattingPenalty;
-
   // Deduct for duplicates
   const duplicatePenalty = (totalDuplicates / totalRows) * 20;
   qualityScore -= duplicatePenalty;
-
-  // Deduct for outliers (minor penalty)
-  const outlierPenalty = (totalOutliers / totalRows) * 10;
-  qualityScore -= outlierPenalty;
 
   qualityScore = Math.max(0, Math.min(100, Math.round(qualityScore)));
 

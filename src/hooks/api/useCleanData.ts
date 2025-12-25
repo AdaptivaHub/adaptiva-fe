@@ -64,9 +64,9 @@ export function useCleanData() {
       setLoading(false);
     }
   }, []);
-
-  const quickClean = useCallback(async (fileId: string): Promise<DataCleaningResponse | null> => {
+  const quickClean = useCallback(async (fileId: string, sheetName?: string): Promise<DataCleaningResponse | null> => {
     return cleanData(fileId, {
+      sheetName,
       normalizeColumns: true,
       removeEmptyRows: true,
       removeEmptyColumns: true,
@@ -75,8 +75,9 @@ export function useCleanData() {
     });
   }, [cleanData]);
 
-  const deepClean = useCallback(async (fileId: string): Promise<DataCleaningResponse | null> => {
+  const deepClean = useCallback(async (fileId: string, sheetName?: string): Promise<DataCleaningResponse | null> => {
     return cleanData(fileId, {
+      sheetName,
       normalizeColumns: true,
       removeEmptyRows: true,
       removeEmptyColumns: true,

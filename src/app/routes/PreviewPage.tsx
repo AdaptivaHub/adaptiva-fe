@@ -2,9 +2,10 @@
  * Preview Page - Data preview and quality analysis
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useFileStore } from '@/stores';
+import { useCleanData } from '@/hooks/api/useCleanData';
 import { DataPreview } from '@design/components/DataPreview';
 import { DataQualityBanner } from '@design/components/DataQualityBanner';
 import { analyzeDataQuality } from '@design/utils/dataQuality';
@@ -15,8 +16,13 @@ export function PreviewPage() {
   const metadata = useFileStore((state) => state.metadata);
   const data = useFileStore((state) => state.data);
   const headers = useFileStore((state) => state.headers);
+  const columnInfo = useFileStore((state) => state.columnInfo);
   const setActiveSheet = useFileStore((state) => state.setActiveSheet);
   const clearFile = useFileStore((state) => state.clearFile);
+  const refreshData = useFileStore((state) => state.refreshData);
+
+  const { loading: isCleaning, quickClean, error: cleaningError } = useCleanData();
+  const [isQualityBannerDismissed, setIsQualityBannerDismissed] = useState(false);
 
   const handleSheetChange = useCallback((sheetName: string) => {
     setActiveSheet(sheetName);
@@ -24,7 +30,32 @@ export function PreviewPage() {
 
   const handleNewUpload = useCallback(() => {
     clearFile();
-  }, [clearFile]);
+  }, [clearFile]);  const handleCleanData = useCallback(async () => {
+    if (!metadata?.fileId) return;
+
+    const result = await quickClean(metadata.fileId, metadata.activeSheet);
+    
+    if (result) {
+      // Refresh the data after cleaning
+      await refreshData();
+      
+      const operationsCount = result.operations_log.length;
+      const rowsRemoved = result.rows_before - result.rows_after;
+      
+      if (operationsCount > 0) {
+        toast.success(
+          `Cleaned data: ${operationsCount} operations performed${rowsRemoved > 0 ? `, ${rowsRemoved} rows removed` : ''}`
+        );
+      } else {
+        toast.info('No cleaning operations were necessary');
+      }
+      
+      // Note: Don't dismiss the banner here - let the quality check re-run
+      // after data refresh and the banner will hide if qualityScore === 100
+    } else if (cleaningError) {
+      toast.error(`Cleaning failed: ${cleaningError}`);
+    }
+  }, [metadata?.fileId, metadata?.activeSheet, quickClean, refreshData, cleaningError]);
 
   // Redirect to upload page if no file is uploaded
   if (!metadata) {
@@ -44,25 +75,22 @@ export function PreviewPage() {
   const qualityReport = data.length > 0
     ? analyzeDataQuality(data, headers)
     : null;
-
   return (
     <div className="p-6 space-y-6">      {/* Data Quality Banner */}
-      {qualityReport && qualityReport.qualityScore < 100 && (
+      {qualityReport && qualityReport.qualityScore < 100 && !isQualityBannerDismissed && (
         <DataQualityBanner
           issues={qualityReport.issues}
           qualityScore={qualityReport.qualityScore}
-          onAction={() => {
-            // TODO: Implement cleaning flow
-            toast.info('Data cleaning coming soon!');
-          }}
+          actionLabel={isCleaning ? 'Cleaning...' : 'Clean Data Now'}
+          onAction={handleCleanData}
+          onDismiss={() => setIsQualityBannerDismissed(true)}
         />
-      )}
-
-      {/* Data Preview */}
+      )}      {/* Data Preview */}
       <DataPreview
         file={uploadedFile}
         data={data}
         headers={headers}
+        columnInfo={columnInfo}
         onSheetChange={metadata.sheets ? handleSheetChange : undefined}
         onNewUpload={handleNewUpload}
       />

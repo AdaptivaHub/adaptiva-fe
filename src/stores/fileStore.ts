@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { uploadService } from '@/services/uploadService';
-import type { DataRow } from '@/types';
+import type { DataRow, ColumnInfo } from '@/types';
 
 interface FileMetadata {
   fileId: string;
@@ -23,12 +23,13 @@ interface FileState {
   // Non-persisted data (fetched on demand)
   data: DataRow[];
   headers: string[];
+  columnInfo: ColumnInfo[];
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  setFile: (metadata: FileMetadata, data: DataRow[], headers: string[]) => void;
-  updateData: (data: DataRow[], headers: string[]) => void;
+  setFile: (metadata: FileMetadata, data: DataRow[], headers: string[], columnInfo?: ColumnInfo[]) => void;
+  updateData: (data: DataRow[], headers: string[], columnInfo?: ColumnInfo[]) => void;
   setActiveSheet: (sheetName: string) => Promise<void>;
   clearFile: () => void;
   refreshData: () => Promise<void>;
@@ -42,24 +43,24 @@ export const useFileStore = create<FileState>()(
       metadata: null,
       data: [],
       headers: [],
+      columnInfo: [],
       isLoading: false,
       error: null,
 
-      setFile: (metadata: FileMetadata, data: DataRow[], headers: string[]) => {
+      setFile: (metadata: FileMetadata, data: DataRow[], headers: string[], columnInfo: ColumnInfo[] = []) => {
         set({
           metadata,
           data,
           headers,
+          columnInfo,
           isLoading: false,
           error: null,
         });
       },
 
-      updateData: (data: DataRow[], headers: string[]) => {
-        set({ data, headers });
-      },
-
-      setActiveSheet: async (sheetName: string) => {
+      updateData: (data: DataRow[], headers: string[], columnInfo: ColumnInfo[] = []) => {
+        set({ data, headers, columnInfo });
+      },      setActiveSheet: async (sheetName: string) => {
         const { metadata } = get();
         if (!metadata?.fileId) return;
 
@@ -83,6 +84,7 @@ export const useFileStore = create<FileState>()(
               metadata: { ...metadata, activeSheet: sheetName },
               data: formattedData,
               headers: result.data.headers,
+              columnInfo: result.data.column_info ?? [],
               isLoading: false,
             });
           } else {
@@ -101,6 +103,7 @@ export const useFileStore = create<FileState>()(
           metadata: null,
           data: [],
           headers: [],
+          columnInfo: [],
           isLoading: false,
           error: null,
         });
@@ -117,9 +120,7 @@ export const useFileStore = create<FileState>()(
             metadata.fileId,
             100,
             metadata.activeSheet
-          );
-
-          if (result.success && result.data) {
+          );          if (result.success && result.data) {
             const formattedData = result.data.data.map((row) =>
               Object.fromEntries(
                 result.data!.headers.map((h) => [h, row[h] ?? null])
@@ -129,6 +130,7 @@ export const useFileStore = create<FileState>()(
             set({
               data: formattedData,
               headers: result.data.headers,
+              columnInfo: result.data.column_info ?? [],
               isLoading: false,
             });
           } else {
