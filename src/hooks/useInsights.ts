@@ -27,3 +27,5 @@ export const useInsights = () => {
 
   return { getInsights, loading, error };
 };
+
+

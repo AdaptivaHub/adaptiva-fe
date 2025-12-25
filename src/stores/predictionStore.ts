@@ -60,3 +60,5 @@ export const usePredictionStore = create<PredictionState>()(
 export const useModels = () => usePredictionStore((state) => state.models);
 export const useIsCreatingModel = () => usePredictionStore((state) => state.isCreating);
 export const useIsTrainingModel = () => usePredictionStore((state) => state.isTraining);
+
+

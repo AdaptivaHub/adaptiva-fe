@@ -159,3 +159,5 @@ export const useFileStore = create<FileState>()(
 export const useFileMetadata = () => useFileStore((state) => state.metadata);
 export const useFileData = () => useFileStore((state) => ({ data: state.data, headers: state.headers }));
 export const useHasFile = () => useFileStore((state) => state.metadata !== null);
+
+

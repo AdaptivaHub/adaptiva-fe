@@ -54,10 +54,9 @@ export function PredictionsView({
             Train machine learning models to predict outcomes from your data
           </p>
         </div>
-        {!isCreating && (
-          <Button
+        {!isCreating && (          <Button
             onClick={onCreateClick}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+            className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Model
@@ -70,8 +69,8 @@ export function PredictionsView({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                <Brain className="w-5 h-5 text-indigo-600" />
+              <div className="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center">
+                <Brain className="w-5 h-5 text-brand-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">Total Models</p>
@@ -82,8 +81,8 @@ export function PredictionsView({
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">Linear Regression</p>
@@ -137,3 +136,5 @@ export function PredictionsView({
     </div>
   );
 }
+
+

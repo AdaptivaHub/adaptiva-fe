@@ -94,3 +94,5 @@ export const useCleanData = () => {
 
   return { cleanData, quickClean, deepClean, loading, error, result, clearError, clearResult };
 };
+
+

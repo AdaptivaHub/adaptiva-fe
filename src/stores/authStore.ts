@@ -187,3 +187,5 @@ export const useAuthStore = create<AuthState>()(
 
 // Hook alias for cleaner imports
 export const useAuth = useAuthStore;
+
+

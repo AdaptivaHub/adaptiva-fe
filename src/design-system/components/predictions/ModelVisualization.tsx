@@ -104,10 +104,9 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              onClick={() => setActiveTab(tab.id as any)}              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-indigo-500 text-indigo-600'
+                  ? 'border-brand-500 text-brand-600'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -176,10 +175,9 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
                 <div className="bg-slate-50 rounded-lg p-8 flex items-center justify-center">
                   <div className="text-center space-y-4">
                     {/* Simple tree visualization */}
-                    <div className="inline-block">
-                      <div className="bg-indigo-100 border-2 border-indigo-500 rounded-lg p-3 mb-4">
-                        <p className="text-xs font-medium text-indigo-900">Root Node</p>
-                        <p className="text-xs text-indigo-700">{model.features[0]} &lt; threshold</p>
+                    <div className="inline-block">                      <div className="bg-brand-100 border-2 border-brand-500 rounded-lg p-3 mb-4">
+                        <p className="text-xs font-medium text-brand-900">Root Node</p>
+                        <p className="text-xs text-brand-700">{model.features[0]} &lt; threshold</p>
                       </div>
                       <div className="flex gap-8 justify-center">
                         <div className="space-y-2">
@@ -191,9 +189,9 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
                         </div>
                         <div className="space-y-2">
                           <div className="w-px h-8 bg-slate-300 mx-auto" />
-                          <div className="bg-purple-100 border border-purple-500 rounded-lg p-2">
-                            <p className="text-xs font-medium text-purple-900">No</p>
-                            <p className="text-xs text-purple-700">More splits...</p>
+                          <div className="bg-brand-100 border border-brand-500 rounded-lg p-2">
+                            <p className="text-xs font-medium text-brand-900">No</p>
+                            <p className="text-xs text-brand-700">More splits...</p>
                           </div>
                         </div>
                       </div>
@@ -260,9 +258,8 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
                   {model.metrics.crossValScores.map((score, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <span className="text-xs font-medium text-slate-600 w-12">Fold {i + 1}</span>
-                      <div className="flex-1 bg-slate-100 rounded-full h-6 relative overflow-hidden">
-                        <div 
-                          className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full flex items-center justify-end pr-2"
+                      <div className="flex-1 bg-slate-100 rounded-full h-6 relative overflow-hidden">                        <div 
+                          className="bg-gradient-to-r from-brand-500 to-brand-600 h-full rounded-full flex items-center justify-end pr-2"
                           style={{ width: `${score * 100}%` }}
                         >
                           <span className="text-xs font-medium text-white">
@@ -335,7 +332,7 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
                 <div className="mt-4 space-y-2">
                   {model.type === 'linear-regression' && (
                     <div className="text-xs text-slate-600 space-y-1">
-                      <p>• <span className="inline-block w-3 h-3 bg-indigo-500 rounded mr-1" /> Positive coefficient: Increases target value</p>
+                      <p>• <span className="inline-block w-3 h-3 bg-brand-500 rounded mr-1" /> Positive coefficient: Increases target value</p>
                       <p>• <span className="inline-block w-3 h-3 bg-red-500 rounded mr-1" /> Negative coefficient: Decreases target value</p>
                     </div>
                   )}
@@ -353,3 +350,5 @@ export function ModelVisualization({ model, data: _data }: ModelVisualizationPro
     </div>
   );
 }
+
+

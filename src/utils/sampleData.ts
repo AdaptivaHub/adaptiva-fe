@@ -38,3 +38,5 @@ export function scrollToUploadZone(): void {
     uploadElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
+
+

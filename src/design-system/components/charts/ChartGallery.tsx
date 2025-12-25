@@ -66,8 +66,7 @@ export function ChartGallery({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          <div>          <h2 className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-brand-500 bg-clip-text text-transparent">
               {editingChart ? 'Edit Chart' : 'Create Chart'}
             </h2>
             <p className="text-sm text-slate-600 mt-1">
@@ -97,8 +96,7 @@ export function ChartGallery({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <div>          <h2 className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-brand-500 bg-clip-text text-transparent">
             Chart Gallery
           </h2>
           <p className="text-sm text-slate-600 mt-1">
@@ -111,16 +109,15 @@ export function ChartGallery({
         <div className="flex items-center gap-2">
           {charts.length > 0 && (
             <>
-              <div className="flex items-center gap-1 border rounded-lg p-1">
-                <button
+              <div className="flex items-center gap-1 border rounded-lg p-1">              <button
                   onClick={() => onViewModeChange?.('grid')}
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-100'}`}
+                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-brand-100 text-brand-600' : 'text-slate-600 hover:bg-slate-100'}`}
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => onViewModeChange?.('list')}
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-600 hover:bg-slate-100'}`}
+                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-brand-100 text-brand-600' : 'text-slate-600 hover:bg-slate-100'}`}
                 >
                   <Grid3x3 className="w-4 h-4" />
                 </button>
@@ -130,10 +127,9 @@ export function ChartGallery({
                 Export All
               </Button>
             </>
-          )}
-          <Button
+          )}          <Button
             onClick={onCreateClick}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600"
+            className="bg-gradient-to-r from-brand-500 to-brand-600"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Chart
@@ -145,8 +141,8 @@ export function ChartGallery({
       {charts.length === 0 ? (
         <Card className="p-12">
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
-              <LayoutGrid className="w-8 h-8 text-indigo-600" />
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-brand-100 to-brand-200 rounded-full flex items-center justify-center">
+              <LayoutGrid className="w-8 h-8 text-brand-600" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -157,7 +153,7 @@ export function ChartGallery({
               </p>
               <Button
                 onClick={onCreateClick}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600"
+                className="bg-gradient-to-r from-brand-500 to-brand-600"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Chart
@@ -188,3 +184,5 @@ export function ChartGallery({
     </div>
   );
 }
+
+

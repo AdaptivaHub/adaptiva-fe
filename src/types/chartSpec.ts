@@ -274,3 +274,5 @@ export function createDefaultChartSpec(fileId: string, sheetName?: string): Char
 export function chartTypeRequiresYAxis(chartType: ChartType): boolean {
   return !['histogram', 'pie', 'box'].includes(chartType);
 }
+
+

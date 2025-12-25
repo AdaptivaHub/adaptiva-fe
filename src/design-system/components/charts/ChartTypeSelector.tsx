@@ -34,22 +34,22 @@ export function ChartTypeSelector({ value, onChange, allowedTypes }: ChartTypeSe
           key={type}
           onClick={() => onChange(type)}
           className={cn(
-            'flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:border-indigo-300 hover:bg-indigo-50',
+            'flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:border-brand-300 hover:bg-brand-50',
             value === type
-              ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 shadow-sm'
+              ? 'border-brand-500 bg-gradient-to-br from-brand-50 to-brand-100 shadow-sm'
               : 'border-slate-200 bg-white'
           )}
         >
           <Icon
             className={cn(
               'w-5 h-5',
-              value === type ? 'text-indigo-600' : 'text-slate-600'
+              value === type ? 'text-brand-600' : 'text-slate-600'
             )}
           />
           <span
             className={cn(
               'text-xs font-medium',
-              value === type ? 'text-indigo-700' : 'text-slate-700'
+              value === type ? 'text-brand-700' : 'text-slate-700'
             )}
           >
             {label}
@@ -59,3 +59,5 @@ export function ChartTypeSelector({ value, onChange, allowedTypes }: ChartTypeSe
     </div>
   );
 }
+
+

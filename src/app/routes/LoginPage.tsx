@@ -83,7 +83,7 @@ export function LoginPage() {
 
         <Button
           type="submit"
-          className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+          className="w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
           disabled={isLoading}
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
@@ -92,10 +92,12 @@ export function LoginPage() {
 
       <div className="text-center text-sm text-slate-500">
         Don't have an account?{' '}
-        <Link to="/register" className="text-indigo-600 hover:text-indigo-500 font-medium">
+        <Link to="/register" className="text-brand-600 hover:text-brand-500 font-medium">
           Sign up
         </Link>
       </div>
     </div>
   );
 }
+
+

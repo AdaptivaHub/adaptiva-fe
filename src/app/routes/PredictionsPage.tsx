@@ -77,10 +77,9 @@ export function PredictionsPage() {
           icon={<Upload className="w-12 h-12" />}
           title="No Data Available"
           description="Upload a file first to train ML prediction models."
-          action={
-            <Button
+          action={            <Button
               onClick={() => navigate('/upload')}
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+              className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
             >
               <Upload className="w-4 h-4 mr-2" />
               Upload File
@@ -107,3 +106,5 @@ export function PredictionsPage() {
     </div>
   );
 }
+
+

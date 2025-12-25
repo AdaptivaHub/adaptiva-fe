@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Sparkles, Plus, Wand2 } from 'lucide-react';
+import { Plus, Wand2 } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { BrandLogo } from '../BrandLogo';
 import { ChartTypeSelector, type ChartType } from './ChartTypeSelector';
 import { ChartPreview } from './ChartPreview';
 import { ChartSuggestions } from './ChartSuggestions';
@@ -113,10 +114,9 @@ export function ChartCreator({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Controls */}
-        <Card className="p-6 space-y-6">
-          <div>
+        <Card className="p-6 space-y-6">          <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-500" />
+              <BrandLogo className="w-5 h-5 text-brand-500" />
               Create Chart
             </h3>
             <p className="text-sm text-slate-600">
@@ -138,11 +138,10 @@ export function ChartCreator({
                 onChange={(e) => setAiPrompt(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAIGenerate()}
                 className="flex-1"
-              />
-              <Button 
+              />              <Button 
                 onClick={handleAIGenerate}
                 disabled={!aiPrompt.trim() || isGenerating}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600"
+                className="bg-gradient-to-r from-brand-500 to-brand-600"
               >
                 {isGenerating ? (
                   <div className="flex items-center gap-2">
@@ -151,7 +150,7 @@ export function ChartCreator({
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" />
+                    <BrandLogo className="w-4 h-4" />
                     Generate
                   </div>
                 )}
@@ -247,3 +246,5 @@ export function ChartCreator({
     </div>
   );
 }
+
+

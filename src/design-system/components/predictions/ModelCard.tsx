@@ -149,3 +149,5 @@ export function ModelCard({ model, data, onDelete }: ModelCardProps) {
     </Card>
   );
 }
+
+

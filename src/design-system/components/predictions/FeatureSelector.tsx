@@ -37,7 +37,7 @@ export function FeatureSelector({
       <div className="flex items-center gap-2">
         <button
           onClick={selectAll}
-          className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+          className="text-xs text-brand-600 hover:text-brand-700 font-medium"
         >
           Select All
         </button>
@@ -63,9 +63,9 @@ export function FeatureSelector({
               onClick={() => toggleFeature(feature)}
               className={cn(
                 'flex items-center gap-2 p-3 rounded-lg border text-left transition-all',
-                'hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                'hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500',
                 isSelected
-                  ? 'border-indigo-500 bg-indigo-50'
+                  ? 'border-brand-500 bg-brand-50'
                   : 'border-slate-200 bg-white hover:border-slate-300'
               )}
             >
@@ -74,7 +74,7 @@ export function FeatureSelector({
                 className={cn(
                   'w-5 h-5 rounded flex items-center justify-center border-2 flex-shrink-0',
                   isSelected
-                    ? 'border-indigo-500 bg-indigo-500'
+                    ? 'border-brand-500 bg-brand-500'
                     : 'border-slate-300 bg-white'
                 )}
               >
@@ -88,7 +88,7 @@ export function FeatureSelector({
                 <div className="flex items-center gap-2">
                   <span className={cn(
                     'text-sm font-medium truncate',
-                    isSelected ? 'text-indigo-900' : 'text-slate-700'
+                    isSelected ? 'text-brand-900' : 'text-slate-700'
                   )}>
                     {feature}
                   </span>
@@ -100,7 +100,7 @@ export function FeatureSelector({
                 variant="secondary"
                 className={cn(
                   'flex items-center gap-1 text-xs flex-shrink-0',
-                  isSelected ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'
+                  isSelected ? 'bg-brand-100 text-brand-700' : 'bg-slate-100 text-slate-600'
                 )}
               >
                 <Icon className="w-3 h-3" />
@@ -113,12 +113,12 @@ export function FeatureSelector({
 
       {/* Summary */}
       {selectedFeatures.length > 0 && (
-        <div className="flex items-center gap-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+        <div className="flex items-center gap-2 p-3 bg-brand-50 rounded-lg border border-brand-100">
           <div className="flex-1">
-            <p className="text-sm font-medium text-indigo-900">
+            <p className="text-sm font-medium text-brand-900">
               {selectedFeatures.length} feature{selectedFeatures.length !== 1 ? 's' : ''} selected
             </p>
-            <p className="text-xs text-indigo-600 mt-0.5">
+            <p className="text-xs text-brand-600 mt-0.5">
               {selectedFeatures.join(', ')}
             </p>
           </div>
@@ -127,3 +127,5 @@ export function FeatureSelector({
     </div>
   );
 }
+
+

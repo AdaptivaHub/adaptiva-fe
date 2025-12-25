@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Menu, Upload, ChartBar, Sparkles, FileText, Settings, User, LogOut, ChevronLeft, ChevronRight, Brain } from 'lucide-react';
+import { Menu, Upload, ChartBar, FileText, Settings, User, LogOut, ChevronLeft, ChevronRight, Brain } from 'lucide-react';
 import { Button } from './ui/button';
+import { BrandLogo } from './BrandLogo';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -142,10 +143,10 @@ export function DashboardLayout({
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
           {!sidebarCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center">
+                <BrandLogo className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="font-bold text-lg bg-gradient-to-r from-brand-600 to-brand-600 bg-clip-text text-transparent">
                 Adaptiva
               </span>
             </div>
@@ -173,7 +174,7 @@ export function DashboardLayout({
                 className={cn(
                   'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left relative',
                   isActive && !item.disabled
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md'
                     : 'text-slate-700 hover:bg-slate-100',
                   item.disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent !text-slate-400 !bg-transparent',
                   item.hasWarning && !item.disabled && 'ring-2 ring-yellow-400 ring-offset-2'
@@ -258,10 +259,10 @@ export function DashboardLayout({
             
             {showUpgradeButton && (
               <Button 
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-md"
+                className="bg-gradient-to-r from-brand-500 to-brand-600 text-white hover:from-brand-600 hover:to-brand-700 shadow-md"
                 onClick={onUpgradeClick}
               >
-                <Sparkles className="w-4 h-4 mr-2" />
+                <BrandLogo className="w-4 h-4 mr-2" />
                 Upgrade to Pro
               </Button>
             )}
@@ -271,7 +272,7 @@ export function DashboardLayout({
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="gap-2">
                     <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                      <AvatarFallback className="bg-gradient-to-br from-brand-500 to-brand-600 text-white">
                         {userInfo.initials}
                       </AvatarFallback>
                     </Avatar>
@@ -311,3 +312,5 @@ export function DashboardLayout({
     </div>
   );
 }
+
+

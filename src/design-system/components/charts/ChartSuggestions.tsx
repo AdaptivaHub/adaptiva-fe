@@ -116,3 +116,5 @@ function getSuggestionIcon(type: string) {
       return TrendingUp;
   }
 }
+
+

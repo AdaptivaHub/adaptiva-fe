@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { Sparkles, AlertTriangle, X, ArrowRight } from 'lucide-react';
+import { AlertTriangle, X, ArrowRight } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
+import { BrandLogo } from './BrandLogo';
 
 // Generic issue type for design system (no domain-specific semantics)
 export interface BannerIssue {
@@ -74,17 +75,16 @@ export function DataQualityBanner({
   };
 
   const totalIssues = issues.reduce((sum, issue) => sum + issue.count, 0);
-
   return (
-    <Card className="p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-indigo-200 relative overflow-hidden">
+    <Card className="p-5 bg-gradient-to-r from-brand-50 via-brand-50 to-brand-100 border-brand-200 relative overflow-hidden">
       {/* Decorative background */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-200/30 to-brand-300/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       
       <div className="relative">
         <div className="flex items-start gap-4">          {/* Icon */}
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-              {icon ?? <Sparkles className="w-6 h-6 text-white" />}
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center shadow-lg">
+              {icon ?? <BrandLogo className="w-6 h-6 text-white" />}
             </div>
           </div>
 
@@ -151,10 +151,9 @@ export function DataQualityBanner({
                 <p className="text-xs text-slate-600">
                   {benefitDescription}
                 </p>
-              </div>
-              <Button
+              </div>              <Button
                 onClick={handleAction}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-md whitespace-nowrap"
+                className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-md whitespace-nowrap"
               >
                 {actionLabel}
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -166,3 +165,5 @@ export function DataQualityBanner({
     </Card>
   );
 }
+
+

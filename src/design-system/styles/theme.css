@@ -39,6 +39,18 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Brand Colors - Change these to update the entire app theme */
+  --brand-50: #e8f4f6;
+  --brand-100: #c5e3e8;
+  --brand-200: #9dd0d9;
+  --brand-300: #6bb8c5;
+  --brand-400: #418090;
+  --brand-500: #357180;
+  --brand-600: #2d5f6b;
+  --brand-700: #254e58;
+  --brand-800: #1d3d45;
+  --brand-900: #152c32;
 }
 
 .dark {
@@ -79,6 +91,18 @@
 }
 
 @theme inline {
+  /* Brand Color Palette - references :root variables for easy theming */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -178,14 +202,13 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
-
   /* Upload Zone Pulsing Animation */
   @keyframes upload-pulse {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 0 0 rgba(65, 128, 144, 0.4);
     }
     50% {
-      box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+      box-shadow: 0 0 0 8px rgba(65, 128, 144, 0);
     }
   }
 
@@ -196,12 +219,12 @@
   /* Highlight Pulse for Scroll Target */
   @keyframes highlight-pulse {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5);
-      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 0 0 0 rgba(65, 128, 144, 0.5);
+      border-color: rgba(65, 128, 144, 0.3);
     }
     50% {
-      box-shadow: 0 0 0 12px rgba(99, 102, 241, 0);
-      border-color: rgba(99, 102, 241, 0.8);
+      box-shadow: 0 0 0 12px rgba(65, 128, 144, 0);
+      border-color: rgba(65, 128, 144, 0.8);
     }
   }
 

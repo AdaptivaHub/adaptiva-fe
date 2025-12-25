@@ -10,3 +10,5 @@ export { PredictionsPage } from './PredictionsPage';
 export { SettingsPage } from './SettingsPage';
 export { LoginPage } from './LoginPage';
 export { RegisterPage } from './RegisterPage';
+
+

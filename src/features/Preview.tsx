@@ -65,3 +65,5 @@ export const Preview: React.FC<PreviewProps> = ({ data, headers, sheets, activeS
     </div>
   );
 };
+
+

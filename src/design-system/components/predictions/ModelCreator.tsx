@@ -142,7 +142,7 @@ export function ModelCreator({
   };
 
   return (
-    <Card className="p-6 border-2 border-indigo-200 bg-gradient-to-br from-indigo-50/30 to-purple-50/30">
+    <Card className="p-6 border-2 border-brand-200 bg-gradient-to-br from-brand-50/30 to-brand-100/30">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-slate-900">Create Prediction Model</h3>
@@ -191,7 +191,7 @@ export function ModelCreator({
             id="target-variable"
             value={targetVariable}
             onChange={(e) => setTargetVariable(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">Select target variable...</option>
             {validTargets.map(header => (
@@ -235,7 +235,7 @@ export function ModelCreator({
         <div>
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+            className="flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700"
           >
             {showAdvanced ? '▼' : '▶'} Advanced Settings
           </button>
@@ -305,7 +305,7 @@ export function ModelCreator({
           <Button
             onClick={handleTrain}
             disabled={hasErrors || isTraining}
-            className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+            className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
           >
             {isTraining ? (
               <>
@@ -328,3 +328,5 @@ export function ModelCreator({
     </Card>
   );
 }
+
+

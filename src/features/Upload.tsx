@@ -88,3 +88,5 @@ const IdleState: React.FC<{ fileName: string; onBrowse: () => void }> = ({ fileN
     {fileName && <p className="file-name">Selected: {fileName}</p>}
   </>
 );
+
+

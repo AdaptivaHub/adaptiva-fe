@@ -43,7 +43,7 @@ export interface UploadZoneProps {
 const colorSchemes = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
   green: { bg: 'bg-green-100', text: 'text-green-600' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
+  purple: { bg: 'bg-brand-100', text: 'text-brand-600' },
   orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
   pink: { bg: 'bg-pink-100', text: 'text-pink-600' },
 };
@@ -107,7 +107,7 @@ export function UploadZone({
       <Card
         className={cn(
           'relative overflow-hidden transition-all duration-200 upload-pulse',
-          isDragActiveState && 'ring-2 ring-indigo-500 ring-offset-2',
+          isDragActiveState && 'ring-2 ring-brand-500 ring-offset-2',
           isLoading && 'pointer-events-none'
         )}
         onDragOver={handleDragOver}
@@ -115,31 +115,29 @@ export function UploadZone({
         onDrop={handleDrop}
       >
         <div className="p-12">
-          {!isLoading ? (
-            <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-4">
-                <Upload className="w-8 h-8 text-indigo-600" />
+          {!isLoading ? (            <div className="text-center">
+              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-brand-100 to-brand-200 flex items-center justify-center mb-4">
+                <Upload className="w-8 h-8 text-brand-600" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">
                 Drop your file here
               </h3>
               <p className="text-sm text-slate-500 mb-6">
                 or click to browse from your computer
-              </p>
-
-              <input
+              </p>              <input
                 type="file"
                 id="file-upload"
                 className="hidden"
                 accept={acceptedTypes}
                 onChange={handleFileSelect}
               />
-              <Button asChild className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700">
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose File
-                </label>
-              </Button>
+              <label 
+                htmlFor="file-upload" 
+                className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 transition-colors"
+              >
+                <Upload className="w-4 h-4" />
+                Choose File
+              </label>
 
               <div className="mt-8 pt-8 border-t border-slate-200">
                 <p className="text-xs text-slate-500 mb-2">Supported formats</p>
@@ -156,13 +154,12 @@ export function UploadZone({
                 <p className="text-xs text-slate-400 mt-2">{maxFileSizeText}</p>
               </div>
             </div>
-          ) : (
-            <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-4">
+          ) : (            <div className="text-center">
+              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-brand-100 to-brand-200 flex items-center justify-center mb-4">
                 {isComplete ? (
                   <CircleCheck className="w-8 h-8 text-green-600" />
                 ) : (
-                  <Upload className="w-8 h-8 text-indigo-600 animate-pulse" />
+                  <Upload className="w-8 h-8 text-brand-600 animate-pulse" />
                 )}
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -179,12 +176,11 @@ export function UploadZone({
           )}
         </div>
 
-        {/* Drag overlay */}
-        {isDragActiveState && (
-          <div className="absolute inset-0 bg-indigo-50/80 backdrop-blur-sm flex items-center justify-center border-2 border-dashed border-indigo-400">
+        {/* Drag overlay */}        {isDragActiveState && (
+          <div className="absolute inset-0 bg-brand-50/80 backdrop-blur-sm flex items-center justify-center border-2 border-dashed border-brand-400">
             <div className="text-center">
-              <Upload className="w-12 h-12 text-indigo-600 mx-auto mb-2" />
-              <p className="text-lg font-semibold text-indigo-600">Drop file to upload</p>
+              <Upload className="w-12 h-12 text-brand-600 mx-auto mb-2" />
+              <p className="text-lg font-semibold text-brand-600">Drop file to upload</p>
             </div>
           </div>
         )}
@@ -241,3 +237,5 @@ export function UploadZone({
     </div>
   );
 }
+
+

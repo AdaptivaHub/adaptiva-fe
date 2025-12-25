@@ -108,3 +108,5 @@ export function handleApiError<T>(error: unknown): ApiResponse<T> {
     error: error instanceof Error ? error.message : 'An unknown error occurred',
   };
 }
+
+

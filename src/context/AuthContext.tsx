@@ -234,3 +234,5 @@ export function getAnonymousSession(): string | null {
 export function setAnonymousSession(token: string): void {
   localStorage.setItem(ANON_SESSION_KEY, token);
 }
+
+

@@ -58,11 +58,11 @@ export function ChartCard({
     const colors: Record<ChartType, string> = {
       bar: 'bg-blue-100 text-blue-700 border-blue-200',
       line: 'bg-green-100 text-green-700 border-green-200',
-      area: 'bg-purple-100 text-purple-700 border-purple-200',
+      area: 'bg-brand-100 text-brand-700 border-brand-200',
       pie: 'bg-orange-100 text-orange-700 border-orange-200',
       scatter: 'bg-pink-100 text-pink-700 border-pink-200',
       histogram: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-      box: 'bg-teal-100 text-teal-700 border-teal-200',
+      box: 'bg-brand-100 text-brand-700 border-brand-200',
       heatmap: 'bg-red-100 text-red-700 border-red-200',
     };
     return colors[type] || 'bg-slate-100 text-slate-700 border-slate-200';
@@ -245,3 +245,5 @@ export function ChartCard({
     </Card>
   );
 }
+
+

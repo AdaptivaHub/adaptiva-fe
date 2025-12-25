@@ -22,7 +22,7 @@ export function MainLayout() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
       </div>
     );
   }
@@ -135,3 +135,5 @@ function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2);
 }
+
+

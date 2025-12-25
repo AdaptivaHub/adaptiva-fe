@@ -17,6 +17,7 @@ export { DataQualityBanner } from './components/DataQualityBanner';
 export type { DataQualityBannerProps, BannerIssue } from './components/DataQualityBanner';
 export { EmptyState } from './components/EmptyState';
 export type { EmptyStateProps } from './components/EmptyState';
+export { BrandLogo } from './components/BrandLogo';
 export { UploadZone } from './components/UploadZone';
 export type { UploadZoneProps, SampleDataset } from './components/UploadZone';
 
@@ -43,3 +44,5 @@ export { PredictionsView } from './components/predictions/PredictionsView';
 
 // Utils (export functions, not types again)
 export { analyzeDataQuality } from './utils/dataQuality';
+
+

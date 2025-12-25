@@ -30,7 +30,7 @@ export function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-600" />
+            <User className="w-5 h-5 text-brand-600" />
             Profile
           </CardTitle>
           <CardDescription>Your personal information</CardDescription>
@@ -108,3 +108,5 @@ export function SettingsPage() {
     </div>
   );
 }
+
+

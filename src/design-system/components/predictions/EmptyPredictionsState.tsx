@@ -1,4 +1,5 @@
-import { Brain, TrendingUp, GitBranch, Sparkles } from 'lucide-react';
+import { Brain, TrendingUp, GitBranch } from 'lucide-react';
+import { BrandLogo } from '../BrandLogo';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 
@@ -31,8 +32,7 @@ export function EmptyPredictionsState({ onCreateModel }: EmptyPredictionsStatePr
   return (
     <div className="text-center max-w-5xl mx-auto py-12">
       {/* Header */}
-      <div className="mb-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-6 shadow-lg shadow-indigo-500/50">
+      <div className="mb-12">        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 mb-6 shadow-lg shadow-brand-500/50">
           <Brain className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-4xl font-bold text-slate-900 mb-4">
@@ -77,9 +77,8 @@ export function EmptyPredictionsState({ onCreateModel }: EmptyPredictionsStatePr
       {/* Features List */}
       <Card className="p-8 bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
+          <div>          <div className="flex items-center gap-2 mb-2">
+              <BrandLogo className="w-4 h-4 text-brand-600" />
               <h4 className="font-semibold text-slate-900">Multiple Features</h4>
             </div>
             <p className="text-sm text-slate-600">
@@ -88,7 +87,7 @@ export function EmptyPredictionsState({ onCreateModel }: EmptyPredictionsStatePr
           </div>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
+              <BrandLogo className="w-4 h-4 text-brand-500" />
               <h4 className="font-semibold text-slate-900">Auto Validation</h4>
             </div>
             <p className="text-sm text-slate-600">
@@ -97,7 +96,7 @@ export function EmptyPredictionsState({ onCreateModel }: EmptyPredictionsStatePr
           </div>
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-pink-600" />
+              <BrandLogo className="w-4 h-4 text-brand-400" />
               <h4 className="font-semibold text-slate-900">Visual Insights</h4>
             </div>
             <p className="text-sm text-slate-600">
@@ -107,11 +106,10 @@ export function EmptyPredictionsState({ onCreateModel }: EmptyPredictionsStatePr
         </div>
       </Card>
 
-      {/* CTA */}
-      <Button
+      {/* CTA */}      <Button
         onClick={onCreateModel}
         size="lg"
-        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg text-base px-8"
+        className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-lg text-base px-8"
       >
         <Brain className="w-5 h-5 mr-2" />
         Create Your First Model
@@ -119,3 +117,5 @@ export function EmptyPredictionsState({ onCreateModel }: EmptyPredictionsStatePr
     </div>
   );
 }
+
+

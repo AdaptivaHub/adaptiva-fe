@@ -67,3 +67,5 @@ export const useQualityStore = create<QualityState>((set) => ({
 export const useQualityReport = () => useQualityStore((state) => state.report);
 export const useIsAnalyzingQuality = () => useQualityStore((state) => state.isAnalyzing);
 export const useQualityDismissed = () => useQualityStore((state) => state.isDismissed);
+
+

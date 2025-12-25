@@ -27,3 +27,5 @@ export const usePredict = () => {
 
   return { predict, loading, error };
 };
+
+

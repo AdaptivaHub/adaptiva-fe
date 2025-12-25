@@ -7,7 +7,8 @@ import { useFileStore, useAuthStore } from '@/stores';
 import { EmptyState } from '@design/components/EmptyState';
 import { Button } from '@design/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@design/components/ui/card';
-import { Upload, ChartBar, Brain, Sparkles } from 'lucide-react';
+import { Upload, ChartBar, Brain } from 'lucide-react';
+import { BrandLogo } from '@design/components/BrandLogo';
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -23,10 +24,9 @@ export function DashboardPage() {
           icon={<Upload className="w-12 h-12" />}
           title="Welcome to Adaptiva"
           description="Upload your CSV or Excel file to start analyzing and visualizing your data with AI."
-          action={
-            <Button
+          action={            <Button
               onClick={() => navigate('/upload')}
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+              className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
             >
               <Upload className="w-4 h-4 mr-2" />
               Upload File
@@ -52,9 +52,8 @@ export function DashboardPage() {
 
       {/* Current File Card */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-600" />
+        <CardHeader>        <CardTitle className="flex items-center gap-2">
+            <BrandLogo className="w-5 h-5 text-brand-600" />
             Current File
           </CardTitle>
           <CardDescription>
@@ -112,7 +111,7 @@ export function DashboardPage() {
         <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/predictions')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Brain className="w-5 h-5 text-purple-600" />
+              <Brain className="w-5 h-5 text-brand-600" />
               ML Predictions
             </CardTitle>
           </CardHeader>
@@ -126,3 +125,5 @@ export function DashboardPage() {
     </div>
   );
 }
+
+

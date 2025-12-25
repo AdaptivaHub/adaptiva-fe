@@ -54,3 +54,5 @@ export interface MLTrainResponse {
     predicted: number;
   }>;
 }
+
+

@@ -200,9 +200,8 @@ export function DataPreview({
       <Card className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
-                <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
+            <div className="flex items-center gap-3 mb-2">              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-100 to-brand-200 flex items-center justify-center">
+                <FileSpreadsheet className="w-5 h-5 text-brand-600" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{file.fileName}</h2>
@@ -316,21 +315,20 @@ export function DataPreview({
                   const stats = columnStats[header];
                   const Icon = getColumnIcon(stats?.type);
                   return (
-                    <TableHead key={header} className="font-semibold">
-                      <TooltipProvider>
+                    <TableHead key={header} className="font-semibold">                      <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
                               onClick={() => handleSort(header)}
-                              className="flex items-center gap-2 hover:text-indigo-600 transition-colors group w-full"
+                              className="flex items-center gap-2 hover:text-brand-600 transition-colors group w-full"
                             >
                               <Icon className="w-4 h-4 text-slate-400" />
                               <span className="truncate">{header}</span>
                               {sortColumn === header ? (
                                 sortDirection === 'asc' ? (
-                                  <ArrowUp className="w-4 h-4 text-indigo-600" />
+                                  <ArrowUp className="w-4 h-4 text-brand-600" />
                                 ) : (
-                                  <ArrowDown className="w-4 h-4 text-indigo-600" />
+                                  <ArrowDown className="w-4 h-4 text-brand-600" />
                                 )
                               ) : (
                                 <ArrowUpDown className="w-4 h-4 opacity-0 group-hover:opacity-50 transition-opacity" />
@@ -429,15 +427,14 @@ export function DataPreview({
                     pageNum = currentPage - 2 + i;
                   }
 
-                  return (
-                    <Button
+                  return (                    <Button
                       key={pageNum}
                       variant={currentPage === pageNum ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setCurrentPage(pageNum)}
                       className={cn(
                         currentPage === pageNum &&
-                          'bg-gradient-to-r from-indigo-500 to-purple-600'
+                          'bg-gradient-to-r from-brand-500 to-brand-600'
                       )}
                     >
                       {pageNum}
@@ -460,3 +457,5 @@ export function DataPreview({
     </div>
   );
 }
+
+
